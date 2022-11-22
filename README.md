@@ -1,6 +1,6 @@
 <h1 align="center">
   <img src="https://imgur.com/L54eATql.png" alt="Red - Discord Bot">
-  <b>Hoyolab Auto Daily Check-in</b>
+  <p><b>Hoyolab Auto Daily Check-in</b></p>
 </h1>
 
 # Overview
