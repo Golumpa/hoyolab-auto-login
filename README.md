@@ -1,69 +1,63 @@
 <h1 align="center">
-  <br>
-  <a href="https://github.com/vermaysha/Hoyolab-Auto-Daily-Checkin"><img src="https://imgur.com/L54eATq.png" alt="Red - Discord Bot"></a>
-  <br>
-  Hoyolab Auto Daily Check-in
-  <br>
+  <img src="https://imgur.com/L54eATql.png" alt="Red - Discord Bot">
+  <b>Hoyolab Auto Daily Check-in</b>
 </h1>
 
-<!-- <p align="center">
-  <a href="#overview">Overview</a>
-  •
-  <a href="#installation">Installation</a>
-  •
-  <a href="#license">License</a>
-</p> -->
-
-
 # Overview
-Hoyolab auto daily check-in - this is a simple program that allows you to always claim daily login rewards from hoyolab, supports the game Genshin Impact & Honkai Impact 3rd
+A simple program that allows you to always claim Hoyolab's daily login system for Honkai Impact 3 and Genshin Impact. Original script by [vermaysha/Hoyolab-Auto-Daily-Checkin](https://github.com/vermaysha/Hoyolab-Auto-Daily-Checkin).
 
 **Features:**
-1. Send notification to discord channel
-2. Multiple hoyoverse account
+1. Send notification to Discord channel
+2. Multiple accounts detection
 3. Lightweight
 
 # Installation
-1. Make a WayScript Account
-https://wayscript.com/home
+### 1. Make a WayScriptX Account at https://app.wayscript.com
 
-2. Clone the Script<br>Go here and clone this script<br>https://wayscript.com/script/G8r6u_3B<br>
-![(clone)](https://i.imgur.com/BzcEwsl.png)
+### 2. Create a new Lair and clone the script by pasting the URL of this repo under `GitHub URL` field. The Lair's name is up to you.  
+![](images/1.png)
 
-3. Set up the time<br>
-![(time)](https://i.imgur.com/ECpJlSY.png)
+### 3. Navigate to left panel, click on `Secrets` and add the secrets with names listed below:
+- `COOKIE`  
+Navigate to [Hoyolab's Daily Checkin page](https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481&lang=en-us) with your account __logged in__, open developer tools on your browser (F12 for Firefox/Chrome), navigate to `Console` tab, enter `document.cookie` in, copy the long-string text output **without** the quotation marks and save it as a secret named `COOKIE` in your Wayscript Lair. It will be saved with encryption and you won't be able to see it again.
+![](images/3.png)  
+**Disclaimer:** Your account cookie is sensitive and should not be shared with anyone.
 
-4. Set up the .secrets <br> Add the keys `COOKIE` and `USER_AGENT`, the `DISCORD_WEBHOOK` is optional, see at end of page for webhook instructions<br>
-![](https://i.imgur.com/Qf9l2JH.png)
-<br>**How to get OS_COOKIE ?**
-<br>1\. Go to the Hoyolab website https://www.hoyolab.com/
-<br>2. Login with your account
-<br>3. Open the developer tools on your web browser (F12 on firefox/chrome)
-<br>4. Click on the “Console” tab
-<br>5. Type in  `document.cookie`  in the console
-<br>6. Copy all text output from console without quotes `'`
-<br>7. **PLEASE DON'T SHARE YOUR COOKIE TO ANYONE**
-![(token)](https://i.imgur.com/7fSEeB8.png)
-<br>**Multiple account**
-<br>The multi-account feature will make the program run multiple accounts in one run. Use the features properly !.
-<br>in the `COOKIE` variable add a separator with `#` character for each cookie, example:
-![](https://i.imgur.com/urZRZLq.png)
-<br>**How to get USER_AGENT ?**<br>
-You can get your user agent like so:
-![enter image description here](https://i.imgur.com/Jy07NPf.png)
-<br>**How to get DISCORD_WEBHOOK ? (OPTIONAL)**<br>
-Goto [Discord Webhook Configuration](#discord-webhook-configuration)If you want to setup discord webhook.
-1. Run the script <br>
-![](https://i.imgur.com/MvFMagm.png)
-![](https://i.imgur.com/YqqP1Wc.png)
+- `USER_AGENT`  
+You can get your user agent by just simply typing it in your search engine (Google/DuckDuckGo)  
+![](images/4.png)
 
-# Discord Webhook Configuration
-This is an  **OPTIONAL**  step to let the script send you a notification on Discord whenever it runs a check-in.
-1. Create your own discord server and private channel.<br>
-![](https://i.imgur.com/eY4HkBP.png)
-2. Edit channel settings<br>
-3. Go into Integrations and view webhooks.<br>
-![](https://i.imgur.com/Euo2CX2.png)
-4. Create a new webhook and copy the URL.!<br>
-![](https://i.imgur.com/3c7yuCi.png)
-5. Go back to the “.secrets” tab and add a new secret called DISCORD_WEBHOOK.<br>
+- `DISCORD_WEBHOOK` **(Optional)**
+You can have the script notify on a Discord channel via webhook. On any channel where you have webhook permissions in, go into:  
+`Channel Settings > Integrations > Webhooks > New Webhook`  
+You can also choose to use existing one by clicking on `Copy Webhook URL`  
+![](images/5.png)
+
+### 4. Set up your trigger.
+On left panel, click on `Overview` page and then `Open Triggers` on top right. There will be a Plus icon `+` on top right of the trigger panel for you to create a new CRON trigger. Use CRON expression to schedule it to run at your desired time by using this site: https://crontab.guru/  
+
+The time is in UTC, for timezone converter you can refer here: https://www.worldtimebuddy.com/  
+
+Now, enter your CRON expression in the `Crontab` field and `python hoyolab.py` under `Command To Run`. The trigger name can be whatever you want. The entry should appear in the Triggers list.  
+![](images/6.png)
+
+### 5. Verify that your script is working.
+In `Overview` tab from the left panel, click on `Open Terminal` and simply type `python hoyolab.py` and observe the output. You will need to wait for the random sleep timer before your script actually runs.
+![](images/7.png) 
+
+### 6. Deploy!
+Once you've verified that your script runs without error, you can go ahead and deploy it. It will execute at the time you set in Step 4.  
+![](https://i.imgur.com/UJbdZLF.png)
+
+# FAQ 
+- If I play both Genshin and Honkai, does it log in both?  
+Yes.
+
+- How do I log in with multiple accounts?  
+Add a `#` between your cookies.  
+Example:  
+```COOKIE1#COOKIE2#COOKIE3```
+
+- How much time are we alloted on Wayscript X?  
+According to Wayscript we are given 100 hours of runtime a month, this is more than plenty for the login script.  
+Assuming (5min of sleep + 1min runtime) x 31 days = ~180min a month or about 3hours out of 100hours.
