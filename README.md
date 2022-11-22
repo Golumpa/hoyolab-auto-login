@@ -61,3 +61,6 @@ Example:
 - How much time are we alloted on Wayscript X?  
 According to Wayscript we are given 100 hours of runtime a month, this is more than plenty for the login script.  
 Assuming (5min of sleep + 1min runtime) x 31 days = ~180min a month or about 3hours out of 100hours.
+
+- Why aren't you using GitHub Actions?
+There has been cases of repositories getting taken down due to violation of GitHub's Terms of Service. Unfortunately, due to the nature of this script (which counts as account automation), there is a slight risk. Use it at your own risk.
