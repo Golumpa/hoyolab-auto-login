@@ -1,12 +1,20 @@
-import json
-import os
+import json, os, sys, random, time
+
+sys.dont_write_bytecode = True
+
 from log import logging
 from request import req
-from discord_webhook import DiscordWebhook, DiscordEmbed
 
+from discord_webhook import DiscordWebhook, DiscordEmbed
 
 if __name__ != "__main__":
     raise Exception('Run hoyolab.py as main')
+
+# Random sleep section to disperse scripts runtime
+# comment these 3 lines for quick testing
+rand = random.randint(5,300)
+logging.info(f"Sleeping for {rand} seconds ...")
+time.sleep(rand)
 
 logging.info('Hoyolab Auto Daily Check-in Starting ...')
 
@@ -192,11 +200,11 @@ for no in range(len(cookies)):
             webhook.add_embed(embed)
             response = webhook.execute()
             if (response.status_code == 200):
-                logging.info(f'Successfully send notification to your own discord')
+                logging.info(f'Successfully sent notification to your own discord')
             else:
                 logging.error(f'Discord FAILED\n{response}')
 # logging.info(f'{fail}/{len(cookies)} Account executed')
 if fail > 0:
     logging.error(f'{fail} invalid account detected')
-logging.info('Script Ended')
-exit(0)
+logging.info('Script executed successfully.')
+exit()
