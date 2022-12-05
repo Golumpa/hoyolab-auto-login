@@ -64,3 +64,6 @@ Assuming (5min of sleep + 1min runtime) x 31 days = ~180min a month or about 3ho
 
 - Why aren't you using GitHub Actions?  
 There has been cases of repositories getting taken down due to violation of GitHub's Terms of Service. Unfortunately, due to the nature of this script (which counts as account automation), there is a slight risk. Use it at your own risk.
+
+- I need specific help  
+You are free to join my [Discord server](https://dsc.gg/transience) and post your question there. I'll reply when I'm free and try to help from what I know.
