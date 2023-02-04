@@ -4,7 +4,7 @@
 </h1>
 
 ## Overview
-A simple program that allows you to always claim Hoyolab's daily login system for Hoyoverse games. Original script by [vermaysha/Hoyolab-Auto-Daily-Checkin](https://github.com/vermaysha/Hoyolab-Auto-Daily-Checkin).
+A simple program that allows you to always claim Hoyolab's daily login system for Hoyoverse games. Original script by [vermaysha/Hoyolab-Auto-Daily-Checkin](https://github.com/vermaysha/Hoyolab-Auto-Daily-Checkin). I modified it further to fix a few issues, and Dockerize it.
 
 **Features:**
 1. Send notification to Discord channel
