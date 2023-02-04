@@ -189,7 +189,7 @@ while True:
                 embed.add_embed_field(name="Check-in result:", value=status, inline=False)
                 embed_list.append(embed)
 
-    if not webhook:
+    if webhook:
         for e in embed_list:
             webhook.add_embed(e)
         response = webhook.execute()
