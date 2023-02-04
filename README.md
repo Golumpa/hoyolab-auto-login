@@ -11,6 +11,20 @@ A simple program that allows you to always claim Hoyolab's daily login system fo
 2. Multiple accounts detection
 3. Lightweight
 
+## What you need
+1. **Hoyolab account cookie (`COOKIE`)**  
+Navigate to Hoyolab's Daily Checkin page with your account logged in, open developer tools on your browser (F12 for Firefox/Chrome), navigate to Console tab, enter `document.cookie` in, and copy the long-string text output without the quotation marks.
+![](https://raw.githubusercontent.com/raidensakura/hoyolab-auto-login/f0e36c3d39f6e9363b3c772e63ded57c5fbae8c8/images/3.png)
+2. **Browser agent (`USER_AGENT`)**  
+You can get your user agent by just simply typing it in your search engine (Google/DuckDuckGo)
+![](https://raw.githubusercontent.com/raidensakura/hoyolab-auto-login/f0e36c3d39f6e9363b3c772e63ded57c5fbae8c8/images/4.png)
+3. **Discord Webhook URL (`DISCORD_WEBHOOK`) [Optional]**  
+You can have the script notify on a Discord channel via webhook. On any channel where you have webhook permissions in, go into:  
+`Channel Settings > Integrations > Webhooks > New Webhook`  
+You can also choose to use existing one by clicking on `Copy Webhook URL`  
+![](https://raw.githubusercontent.com/raidensakura/hoyolab-auto-login/f0e36c3d39f6e9363b3c772e63ded57c5fbae8c8/images/5.png)
+
+
 ## Installation
 1. [Sign Up on Railway](https://railway.app?referralCode=mh9o_1) if you haven't.
 2. Fork this repo  
@@ -23,10 +37,6 @@ A simple program that allows you to always claim Hoyolab's daily login system fo
 ![image](https://user-images.githubusercontent.com/38610216/216755944-36af97ea-3bb6-44dc-9d2f-4939a4edbb54.png)
 6. Wait for the build to finish and check your deployment logs to verify it's working  
 ![image](https://user-images.githubusercontent.com/38610216/216756065-98e0543a-b4d1-48fa-9431-e36e20a66214.png)
-
-
-
-
 
 ## FAQ 
 - **Do I have to run this on Railway?**  
