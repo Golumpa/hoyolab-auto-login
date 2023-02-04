@@ -1,9 +1,9 @@
 <h1 align="center">
-  <img src="https://imgur.com/L54eATql.png" alt="Red - Discord Bot">
+  <img src="https://imgur.com/L54eATql.png">
   <p><b>Hoyolab Auto Daily Check-in</b></p>
 </h1>
 
-# Overview
+## Overview
 A simple program that allows you to always claim Hoyolab's daily login system for Honkai Impact 3 and Genshin Impact. Original script by [vermaysha/Hoyolab-Auto-Daily-Checkin](https://github.com/vermaysha/Hoyolab-Auto-Daily-Checkin).
 
 **Features:**
@@ -11,59 +11,37 @@ A simple program that allows you to always claim Hoyolab's daily login system fo
 2. Multiple accounts detection
 3. Lightweight
 
-# Installation
-### 1. Make a WayScriptX Account at https://app.wayscript.com
+## Installation
+1. [Sign Up on Railway](https://railway.app?referralCode=mh9o_1) if you haven't.
+2. Fork this repo  
+![image](https://user-images.githubusercontent.com/38610216/216755745-4c347b2c-1e1b-4672-8212-17bd79a24d16.png)
+3. [Make new project on Railway](https://railway.app/new) and select this option  
+![image](https://user-images.githubusercontent.com/38610216/216755833-d97d44ed-0ec5-47cd-9d7d-2130c807de20.png)
+4. Select the new repo you just forked  
+![image](https://user-images.githubusercontent.com/38610216/216755849-01d034f3-e107-43ab-b4e6-7ded9c9a9123.png)
+5. Click "Add Variables" and fill in your stuff, refer to the suggestions below it. After you're done it should look like this  
+![image](https://user-images.githubusercontent.com/38610216/216755944-36af97ea-3bb6-44dc-9d2f-4939a4edbb54.png)
+6. Wait for the build to finish and check your deployment logs to verify it's working  
+![image](https://user-images.githubusercontent.com/38610216/216756065-98e0543a-b4d1-48fa-9431-e36e20a66214.png)
 
-### 2. Create a new Lair and clone the script by pasting the URL of this repo under `GitHub URL` field. The Lair's name is up to you.  
-![](images/1.png)
 
-### 3. Navigate to left panel, click on `Secrets` and add the secrets with names listed below:
-- `COOKIE`  
-Navigate to [Hoyolab's Daily Checkin page](https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481&lang=en-us) with your account __logged in__, open developer tools on your browser (F12 for Firefox/Chrome), navigate to `Console` tab, enter `document.cookie` in, copy the long-string text output **without** the quotation marks and save it as a secret named `COOKIE` in your Wayscript Lair. It will be saved with encryption and you won't be able to see it again.
-![](images/3.png)  
-**Disclaimer:** Your account cookie is sensitive and should not be shared with anyone.
 
-- `USER_AGENT`  
-You can get your user agent by just simply typing it in your search engine (Google/DuckDuckGo)  
-![](images/4.png)
 
-- `DISCORD_WEBHOOK` **(Optional)**
-You can have the script notify on a Discord channel via webhook. On any channel where you have webhook permissions in, go into:  
-`Channel Settings > Integrations > Webhooks > New Webhook`  
-You can also choose to use existing one by clicking on `Copy Webhook URL`  
-![](images/5.png)
 
-### 4. Set up your trigger.
-On left panel, click on `Overview` page and then `Open Triggers` on top right. There will be a Plus icon `+` on top right of the trigger panel for you to create a new CRON trigger. Use CRON expression to schedule it to run at your desired time by using this site: https://crontab.guru/  
+## FAQ 
+- **Do I have to run this on Railway?**  
+You can run it on anything that can run Python or Docker (which is pretty much anything). Railway just happen to be the most user friendly PaaS I currently use.
 
-The time is in UTC, for timezone converter you can refer here: https://www.worldtimebuddy.com/  
-
-Now, enter your CRON expression in the `Crontab` field and `python hoyolab.py` under `Command To Run`. The trigger name can be whatever you want. The entry should appear in the Triggers list.  
-![](images/6.png)
-
-### 5. Verify that your script is working.
-In `Overview` tab from the left panel, click on `Open Terminal` and simply type `python hoyolab.py` and observe the output. You will need to wait for the random sleep timer before your script actually runs.
-![](images/7.png) 
-
-### 6. Deploy!
-Once you've verified that your script runs without error, you can go ahead and deploy it. It will execute at the time you set in Step 4.  
-![](https://i.imgur.com/UJbdZLF.png)
-
-# FAQ 
-- If I play both Genshin and Honkai, does it log in both?  
+- **If I play multiple Hoyoverse games, does it log into all of them?**  
 Yes.
 
-- How do I log in with multiple accounts?  
-Add a `#` between your cookies.  
+- **How do I log in with multiple Hoyolab accounts?**  
+Add a `#` between your cookies.<br><br>
 Example:  
 ```COOKIE1#COOKIE2#COOKIE3```
 
-- How much time are we alloted on Wayscript X?  
-According to Wayscript we're given 100 hours of runtime a month, this is more than plenty for the login script.  
-Assuming (5min of sleep + 1min runtime) x 31 days = ~180min a month or about 3hours out of 100hours.
+- **Why aren't you using GitHub Actions?**  
+There has been multiple repositories getting taken down due to violation of GitHub's Terms of Service. Unfortunately, due to the nature of this script (which counts as account automation), there is a slight risk. Use it at your own risk.
 
-- Why aren't you using GitHub Actions?  
-There has been cases of repositories getting taken down due to violation of GitHub's Terms of Service. Unfortunately, due to the nature of this script (which counts as account automation), there is a slight risk. Use it at your own risk.
-
-- I need specific help  
+- **I need specific help**  
 You are free to join my [Discord server](https://dsc.gg/transience) and post your question there. I'll reply when I'm free and try to help from what I know.
