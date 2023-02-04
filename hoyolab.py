@@ -193,10 +193,10 @@ while True:
         for e in embed_list:
             webhook.add_embed(e)
         response = webhook.execute()
-    if (response.status_code == 200):
-        logging.info(f'Successfully sent Discord embed')
-    else:
-        logging.error(f'Sending embed failed, got ratelimited probably.')
+        if (response.status_code == 200):
+            logging.info(f'Successfully sent Discord embed')
+        else:
+            logging.error(f'Sending embed failed, got ratelimited probably.')
     if fail > 0:
         logging.error(f'{fail} invalid account detected')
     logging.info('Sleeping for a day...')
