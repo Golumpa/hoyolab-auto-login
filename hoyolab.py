@@ -169,7 +169,7 @@ while True:
                 logging.info('Please check in manually once')
 
             webhook = os.environ.get('DISCORD_WEBHOOK','')
-            if (webhook != ''):
+            if not webhook:
                 webhook = DiscordWebhook(url=webhook, rate_limit_retry=True)
                 embed = DiscordEmbed(title=title, description=status, color=color)
                 embed.set_thumbnail(url=award_icon)
@@ -189,7 +189,7 @@ while True:
                 embed.add_embed_field(name="Check-in result:", value=status, inline=False)
                 embed_list.append(embed)
 
-    if (webhook != ''):
+    if not webhook:
         for e in embed_list:
             webhook.add_embed(e)
         response = webhook.execute()
