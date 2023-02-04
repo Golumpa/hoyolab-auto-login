@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = "==2.28.1"
+discord-webhook = "~=0.16.3"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
+
+[scripts]
+login = "python hoyolab.py"
