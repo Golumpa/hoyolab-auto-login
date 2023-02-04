@@ -22,6 +22,7 @@ if (len(cookies) > 1):
 
 while True:
     fail = 0
+    embed_list = []
     for no in range(len(cookies)):
         logging.info(f'Verifiying cookies number: {no+1}')
         header = {
@@ -186,13 +187,16 @@ while True:
                 embed.add_embed_field(name="Today's rewards", value=f'{award_name} x {award_cnt}')
                 embed.add_embed_field(name="Total Daily Check-In", value=total_sign_day)
                 embed.add_embed_field(name="Check-in result:", value=status, inline=False)
-                webhook.add_embed(embed)
-                response = webhook.execute()
-                if (response.status_code == 200):
-                    logging.info(f'Successfully sent notification to your own discord')
-                else:
-                    logging.error(f'Discord FAILED\n{response}')
-    # logging.info(f'{fail}/{len(cookies)} Account executed')
+                embed_list.append(embed)
+
+    if (webhook != ''):
+        for e in embed_list:
+            webhook.add_embed(e)
+        response = webhook.execute()
+    if (response.status_code == 200):
+        logging.info(f'Successfully sent Discord embed')
+    else:
+        logging.error(f'Sending embed failed, got ratelimited probably.')
     if fail > 0:
         logging.error(f'{fail} invalid account detected')
     logging.info('Sleeping for a day...')
