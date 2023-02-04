@@ -170,7 +170,7 @@ while True:
 
             webhook = os.environ.get('DISCORD_WEBHOOK','')
             if (webhook != ''):
-                webhook = DiscordWebhook(url=webhook)
+                webhook = DiscordWebhook(url=webhook, rate_limit_retry=True)
                 embed = DiscordEmbed(title=title, description=status, color=color)
                 embed.set_thumbnail(url=award_icon)
                 embed.set_author(
