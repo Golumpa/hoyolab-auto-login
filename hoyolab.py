@@ -18,7 +18,6 @@ if not cookie:
     raise Exception("Variable 'COOKIE' not found, please ensure that variable exists")
 
 cookies = cookie.split("#")
-
 if len(cookies) > 1:
     logging.info(f"Multiple account detected, number of account {len(cookies)}")
 
@@ -238,4 +237,5 @@ while True:
     if fail > 0:
         logging.error(f"{fail} invalid account detected")
     logging.info("Sleeping for a day...")
+    embed_list.clear()
     time.sleep(86400)  # 1 day
