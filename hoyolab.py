@@ -238,4 +238,4 @@ while True:
     if fail > 0:
         logging.error(f"{fail} invalid account detected")
     logging.info("Sleeping for a day...")
-    time.sleep(10)  # 1 day 86400
+    time.sleep(86400)  # 1 day
