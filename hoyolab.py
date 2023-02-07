@@ -21,13 +21,14 @@ cookies = cookie.split("#")
 if len(cookies) > 1:
     logging.info(f"Multiple account detected, number of account {len(cookies)}")
 
-webhook = os.environ.get("DISCORD_WEBHOOK", None)
-if webhook:
-    webhook = DiscordWebhook(url=webhook, rate_limit_retry=True)
-
 while True:
+
+    webhook = os.environ.get("DISCORD_WEBHOOK", None)
+    if webhook:
+        webhook = DiscordWebhook(url=webhook, rate_limit_retry=True)
     fail = 0
     embed_list = []
+
     for no in range(len(cookies)):
         logging.info(f"Verifiying cookies number: {no+1}")
         header = {
@@ -237,5 +238,4 @@ while True:
     if fail > 0:
         logging.error(f"{fail} invalid account detected")
     logging.info("Sleeping for a day...")
-    embed_list.clear()
-    time.sleep(86400)  # 1 day
+    time.sleep(10)  # 1 day 86400
