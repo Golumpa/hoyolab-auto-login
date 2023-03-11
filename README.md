@@ -13,7 +13,7 @@ A simple program that allows you to always claim Hoyolab's daily login system fo
 
 ## What you need
 1. **Hoyolab account cookie (`COOKIE`)**  
-Navigate to [Hoyolab website](https://www.hoyolab.com/) with your account logged in, open developer tools on your browser (F12 for Firefox/Chrome), navigate to Console tab, enter `document.cookie` in, and copy the long-string text output without the quotation marks.
+Navigate to [Hoyolab website](https://www.hoyolab.com/) with your account logged in, open developer tools on your browser (F12 for Firefox/Chrome), navigate to Console tab, enter `document.cookie` in, and copy the long-string text output without the quotation marks.  
 ![](https://raw.githubusercontent.com/raidensakura/hoyolab-auto-login/f0e36c3d39f6e9363b3c772e63ded57c5fbae8c8/images/3.png)
 2. **Browser agent (`USER_AGENT`)**  
 You can get your user agent by just simply typing it in your search engine (Google/DuckDuckGo)
