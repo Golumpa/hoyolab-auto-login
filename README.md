@@ -38,7 +38,7 @@ You can also choose to use existing one by clicking on `Copy Webhook URL`
 6. Wait for the build to finish and check your deployment logs to verify it's working  
 ![image](https://user-images.githubusercontent.com/38610216/216756065-98e0543a-b4d1-48fa-9431-e36e20a66214.png)
 
-## FAQ 
+## FAQ
 - **Do I have to run this on Railway?**  
 You can run it on anything that can run Python or Docker (which is pretty much anything). Railway just happen to be the most user friendly PaaS I currently use.
 
@@ -55,3 +55,21 @@ There has been multiple repositories getting taken down due to violation of GitH
 
 - **I need specific help**  
 You are free to join my [Discord server](https://dsc.gg/transience) and post your question there. I'll reply when I'm free and try to help from what I know.
+
+## Contributing
+When suggesting changes, please format your code with [black](https://pypi.org/project/black/) and [isort](https://pypi.org/project/isort/).
+
+Install dependencies and activate the pipenv with:
+```
+pipenv install
+pipenv shell
+```
+For formatting:
+```
+pip install -U black isort
+black . ; isort .
+```
+For testing:
+```
+pipenv run login
+```
