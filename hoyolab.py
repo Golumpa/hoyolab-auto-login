@@ -126,6 +126,26 @@ while True:
                 author_name = "Paimon"
                 author_url = "https://genshin.hoyoverse.com"
                 author_icon = "https://img-os-static.hoyolab.com/communityWeb/upload/1d7dd8f33c5ccdfdeac86e1e86ddd652.png"
+            elif account_list[index].get("game_biz", "") == "hkrpg_global":
+                logging.info(
+                    "Honkai Star Rail Account found in server {}".format(region_name)
+                )
+                act_id = "e202303301540311"
+                info_url = "https://sg-public-api.hoyolab.com/event/luna/os/info?act_id={}".format(
+                    act_id
+                )
+                reward_url = "https://sg-public-api.hoyolab.com/event/luna/os/home?act_id={}".format(
+                    act_id
+                )
+                sign_url = "https://sg-public-api.hoyolab.com/event/luna/os/sign?act_id={}".format(
+                    act_id
+                )
+                suffix = "Trailblazer"
+                title = "Honkai Star Rail Daily Login"
+                color = "E0D463"
+                author_name = "Pom-Pom"
+                author_url = "https://hsr.hoyoverse.com/en-us/"
+                author_icon = "https://img-os-static.hoyolab.com/communityWeb/upload/473afd1250b71ba470744aa240f6d638.png"
             elif account_list[index].get("game_biz", "") == "bh3_global":
                 logging.info(
                     "Honkai Impact 3 Account found in server {}".format(region_name)
@@ -147,7 +167,7 @@ while True:
                 author_url = "https://honkaiimpact3.hoyoverse.com/global/en-us"
                 author_icon = "https://img-os-static.hoyolab.com/communityWeb/upload/bbb364aaa7d51d168c96aaa6a1939cba.png"
             else:
-                raise Exception("Genshin Or Honkai Account not found")
+                raise Exception("Genshin, Honkai Star Rail or Honkai Impact 3rd Account not found")
 
             logging.info("Checking in UID {} ...".format(uid))
 
