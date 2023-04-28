@@ -6,11 +6,14 @@ name = "pypi"
 [packages]
 requests = "==2.28.2"
 discord-webhook = "==1.0.0"
+python-dotenv = "==1.0.0"
 
 [dev-packages]
+black = "*"
+isort = "*"
 
 [requires]
-python_version = "3.9"
+python_version = "3.10"
 
 [scripts]
 login = "python hoyolab.py"

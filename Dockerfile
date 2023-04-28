@@ -1,14 +1,6 @@
-FROM python:3.10-alpine as py
+FROM python:3.10-alpine
 
-FROM py as build
-
-COPY requirements.txt /
-RUN apk update && pip install --prefix=/inst -U -r /requirements.txt
-
-FROM py
-
-COPY --from=build /inst /usr/local
-
-WORKDIR /script
-CMD ["python", "hoyolab.py"]
-COPY . /script
+ADD Pipfile Pipfile.lock hoyolab.py log.py request.py /
+RUN apk update && pip install pipenv && pipenv install
+ENV USING_DOCKER True
+CMD ["pipenv", "run", "login"]

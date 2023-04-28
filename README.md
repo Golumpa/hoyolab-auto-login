@@ -66,7 +66,7 @@ pipenv shell
 ```
 For formatting:
 ```
-pip install -U black isort
+pipenv install --dev
 black . ; isort .
 ```
 For testing:
