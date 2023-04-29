@@ -16,13 +16,15 @@ A simple program that allows you to always claim Hoyolab's daily login system fo
 Navigate to [Hoyolab website](https://www.hoyolab.com/) with your account logged in, open developer tools on your browser (F12 for Firefox/Chrome), navigate to Console tab, enter `document.cookie` in, and copy the long-string text output without the quotation marks.  
 ![](https://raw.githubusercontent.com/raidensakura/hoyolab-auto-login/f0e36c3d39f6e9363b3c772e63ded57c5fbae8c8/images/3.png)
 2. **Browser agent (`USER_AGENT`)**  
-You can get your user agent by just simply typing it in your search engine (Google/DuckDuckGo)
+You can get your user agent by just simply typing it in your search engine (Google/DuckDuckGo)  
 ![](https://raw.githubusercontent.com/raidensakura/hoyolab-auto-login/f0e36c3d39f6e9363b3c772e63ded57c5fbae8c8/images/4.png)
 3. **Discord Webhook URL (`DISCORD_WEBHOOK`) [Optional]**  
 You can have the script notify on a Discord channel via webhook. On any channel where you have webhook permissions in, go into:  
 `Channel Settings > Integrations > Webhooks > New Webhook`  
 You can also choose to use existing one by clicking on `Copy Webhook URL`  
 ![](https://raw.githubusercontent.com/raidensakura/hoyolab-auto-login/f0e36c3d39f6e9363b3c772e63ded57c5fbae8c8/images/5.png)
+4. **(`RUN_ONCE`) [Optional]**  
+This should either be left unset, or a value of `True` or `False`. Set it to `True` if you have an external scheduler (like CRON) to automatically start the script at certain time. The script will run as a process when this value is set to `False`.
 
 
 ## Installation
