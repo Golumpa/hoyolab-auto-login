@@ -54,7 +54,7 @@ You can also choose to use existing one by clicking on `Copy Webhook URL`
 <details>
 <summary><b>(Optional) Whether the script should (<code>RUN_ONCE</code>) or continuously</b></summary>
 
-This should either be left unset, or a value of `True` or `False`. Set it to `True` if you have an external scheduler (like CRON) to automatically start the script at certain time. The script will run as a process when this value is set to `False`.
+This should either be left unset, or a value of `True`. Set it to `True` if you have an external scheduler (like CRON) to automatically start the script at certain time. The script will run continuously as a process when this is unset.
 
 </details>
 
@@ -114,7 +114,7 @@ The supported games for now are:
   - Honkai Impact 3rd  
   - Genshin Impact  
   - Honkai: Star Rail  
- 
+
   If you've binded those game accounts to your Hoyolab account, it will claim the daily login in all of them.
 
 - **How do I log in with multiple Hoyolab accounts?**  
