@@ -6,9 +6,10 @@ on:
 
 jobs:
   railway-start:
-    if: ${{ secrets.RAILWAY_SCHEDULE == 'true' }}
     runs-on: ubuntu-latest
-
+    env: 
+      railway_schedule: ${{ secrets.RAILWAY_SCHEDULE }}
+    if: ${{ env.railway_schedule }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
