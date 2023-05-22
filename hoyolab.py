@@ -158,9 +158,10 @@ while True:
 
             else:
                 logging.error(
-                    account_list[index].get("game_biz", ""),
-                    "is currently not supported. Please open an issue on github for it to be added.",
+                    f"Game account {account_list[index].get('game_biz', '')} is currently not supported."
+                    f" Please open an issue on github for it to be added."
                 )
+                continue
 
             logging.info(f"Checking in UID {uid} ...")
 
