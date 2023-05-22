@@ -136,6 +136,7 @@ The supported games for now are:
   - Honkai Impact 3rd  
   - Genshin Impact  
   - Honkai: Star Rail  
+  - Tears of Themis  
 
   If you've binded those game accounts to your Hoyolab account, it will claim the daily login in all of them.
 

@@ -156,6 +156,23 @@ while True:
                 author_url = "https://honkaiimpact3.hoyoverse.com/global/en-us"
                 author_icon = "https://img-os-static.hoyolab.com/communityWeb/upload/bbb364aaa7d51d168c96aaa6a1939cba.png"
 
+            elif account_list[index].get("game_biz", "") == "nxx_global":
+                logging.info(f"Tears of Themis Account found in server {region_name}")
+                act_id = "e202202281857121"
+                info_url = f"https://sg-public-api.hoyolab.com/event/luna/os/info?act_id={act_id}"
+                reward_url = (
+                    f"https://sg-public-api.hoyolab.com/event/luna/home?act_id={act_id}"
+                )
+                sign_url = (
+                    f"https://sg-public-api.hoyolab.com/event/luna/sign?act_id={act_id}"
+                )
+                suffix = "Detective"
+                title = "Tears of Themis Daily Login"
+                color = "86EAC1"
+                author_name = "Luke Pearce"
+                author_url = "https://tot.hoyoverse.com/en-us/"
+                author_icon = "https://img-os-static.hoyolab.com/communityWeb/upload/e500ff6fef5d44fa38db2ba52f34b771.png"
+
             else:
                 logging.error(
                     f"Game account {account_list[index].get('game_biz', '')} is currently not supported."
