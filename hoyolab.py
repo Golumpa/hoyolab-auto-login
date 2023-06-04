@@ -185,6 +185,13 @@ while True:
             res = req.to_python(req.request("get", info_url, headers=header).text)
 
             login_info = res.get("data", {})
+
+            if not login_info:
+                logging.error(
+                    f"Could not obtain login info for cookie {no} in for {biz}, Check if it contains valid cookie_token or ltoken"
+                )
+                continue
+
             today = login_info.get("today")
             total_sign_day = login_info.get("total_sign_day")
 
