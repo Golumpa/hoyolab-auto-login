@@ -145,6 +145,13 @@ Add a `#` between your cookies.<br><br>
 Example:  
 ```COOKIE1#COOKIE2#COOKIE3```
 
+- **My `cookie_token` is missing!**  
+Try logging out and logging back in into your Hoyolab account. Additionally, also try getting the cookie from the login page of any of the games.  
+   * [Daily Check-in page for Genshin Impact](https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481)
+   * [Daily Check-in page for Honkai: Star Rail](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311)
+   * [Daily Check-in page for Honkai Impact 3rd](https://act.hoyolab.com/bbs/event/signin-bh3/index.html?act_id=e202110291205111)
+   * [Daily Check-in page for Tears of Themis](https://act.hoyolab.com/bbs/event/signin/nxx/index.html?act_id=e202202281857121)
+
 - **Why aren't you using GitHub Actions?**  
 There has been multiple repositories getting taken down due to violation of GitHub's Terms of Service. Unfortunately, due to the nature of this script (which counts as account automation), it's better safe than sorry. Again, as a disclaimer, **I take no responsibility of the security and safety of your account by using this script**.
 
