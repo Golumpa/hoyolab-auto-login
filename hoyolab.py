@@ -67,7 +67,7 @@ def remove_duplicates_by_level(list_of_dicts):
 
     Returns:
         list: Games list with duplicate game regions removed
-    """    
+    """
     unique_dicts = {}
 
     for dictionary in list_of_dicts:
@@ -107,7 +107,9 @@ def claim_daily_login(header: dict, games: list):
             continue
 
         censored_uid = "x" * 4 + game["game_uid"][4:]
-        logging.info(f"Checking in {game['nickname']} for {login_const[biz_name]['game_name']} (UID: {censored_uid})")
+        logging.info(
+            f"Checking in {game['nickname']} for {login_const[biz_name]['game_name']} (UID: {censored_uid})"
+        )
 
         # Get login info
         res = req.to_python(req.request("get", login_const[biz_name]["info_url"], headers=header).text)
@@ -175,7 +177,7 @@ def send_discord_embed(login_results, url):
     Args:
         login_results (dict): Result from the login function
         url (str): The URL of the Discord embed to send messages to
-    """    
+    """
     webhook = DiscordWebhook(url=url, rate_limit_retry=True)
 
     for biz_name, data in login_results.items():
