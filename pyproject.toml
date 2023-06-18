@@ -1,0 +1,34 @@
+[tool.black]
+line-length = "110"
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+(
+  /(
+      \.eggs
+    | \.git
+    | \.venv
+    | venv
+    | venv2
+    | _build
+    | build
+    | dist
+    | plugins
+    | temp
+  )/
+)
+'''
+
+[tool.ruff]
+target-version = "py310"
+line-length = 110
+select = ["C90", "E", "F", "I001", "PGH004", "RUF100"]
+ignore = ["F405", "E741", "C901", "F403", "E501"]
+fix = true
+fixable = ["I001"]
+isort.combine-as-imports = true
+force-exclude = true
+
+[tool.ruff.mccabe]
+# Unlike Flake8, default to a complexity level of 10.
+max-complexity = 25

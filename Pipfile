@@ -10,15 +10,8 @@ python-dotenv = "==1.0.0"
 
 [dev-packages]
 black = "*"
-isort = "*"
-
-[requires]
-python_version = "3.10"
+ruff = "*"
+pre-commit = "*"
 
 [scripts]
 login = "python hoyolab.py"
-
-[tool.black]
-line-length = 99
-target-version = ["py310"]
-extend-exclude = ".stubs"
