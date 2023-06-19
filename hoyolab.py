@@ -1,61 +1,29 @@
 import asyncio
 import json
+import logging
 import os
+import re
 import sys
 import time
 
-from discord_webhook import DiscordEmbed, DiscordWebhook
+import aiohttp
+import coloredlogs
+from discord_webhook import AsyncDiscordWebhook, DiscordEmbed
 from dotenv import load_dotenv
 
 from constants import login_const
-from log import logging
-from request import req
 
 sys.dont_write_bytecode = True
 
 load_dotenv()
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(asctime)s] [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
-def get_account_info(header: dict):
-    """Try to get Hoyolab account info and verify if cookie is valid
-
-    Args:
-        header (dict): Dict containing the request headers
-
-    Returns:
-        str: The result of the API request containing Hoyolab account info
-        int: Retry code returned by the API
-        str: Reply message returned by the API
-    """
-    res = req.to_python(
-        req.request(
-            "get",
-            "https://api-account-os.hoyolab.com/auth/api/getUserAccountInfoByLToken",
-            headers=header,
-        ).text
-    )
-
-    return res.get("data"), res.get("retcode"), res.get("message")
-
-
-def get_games_list(header: dict):
-    """Get binded games list for the Hoyolab cookie
-
-    Args:
-        header (dict): Dict containing the request headers
-
-    Returns:
-        str: The result of the API request containing games list
-    """
-    res = req.to_python(
-        req.request(
-            "get",
-            "https://api-os-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie",
-            headers=header,
-        ).text
-    )
-
-    return res.get("data")
+coloredlogs.install()
 
 
 def remove_duplicates_by_level(list_of_dicts):
@@ -79,11 +47,46 @@ def remove_duplicates_by_level(list_of_dicts):
         else:
             if level > unique_dicts[game_biz]["level"]:
                 unique_dicts[game_biz] = dictionary
-
     return list(unique_dicts.values())
 
 
-def claim_daily_login(header: dict, games: list):
+async def get_account_info(header: dict):
+    """Try to get Hoyolab account info and verify if cookie is valid
+
+    Args:
+        header (dict): Dict containing the request headers
+
+    Returns:
+        str: The result of the API request containing Hoyolab account info
+        int: Retry code returned by the API
+        str: Reply message returned by the API
+    """
+    async with aiohttp.ClientSession() as session:
+        res = await session.get(
+            "https://api-account-os.hoyolab.com/auth/api/getUserAccountInfoByLToken", headers=header
+        )
+        user = await res.json()
+    return user.get("data"), user.get("retcode"), user.get("message")
+
+
+async def get_games_list(header: dict):
+    """Get binded games list for the Hoyolab cookie
+
+    Args:
+        header (dict): Dict containing the request headers
+
+    Returns:
+        str: The result of the API request containing games list
+    """
+    async with aiohttp.ClientSession() as session:
+        res = await session.get(
+            "https://api-os-takumi.mihoyo.com/binding/api/getUserGameRolesByCookie", headers=header
+        )
+        games = await res.json()
+    return games.get("data")
+
+
+async def claim_daily_login(header: dict, games: list):
     """Iterate through game list and claim daily login
 
     Args:
@@ -112,48 +115,53 @@ def claim_daily_login(header: dict, games: list):
         )
 
         # Get login info
-        res = req.to_python(req.request("get", login_const[biz_name]["info_url"], headers=header).text)
-        login_info = res.get("data", {})
+        async with aiohttp.ClientSession() as session:
+            res = await session.get(login_const[biz_name]["info_url"], headers=header)
+            res = await res.json()
+        login_info = res.get("data")
         if not login_info:
-            logging.error(f"Could not obtain login info for {biz_name}:\n{login_info['message']}")
+            logging.error(f"Could not obtain login info for {biz_name}. {login_info.get('message')}")
             continue
         if login_info.get("first_bind") is True:
             logging.info(f"{game['nickname']}, please check in manually once")
             continue
 
         # Get reward info
-        res = req.to_python(req.request("get", login_const[biz_name]["reward_url"], headers=header).text)
-        rewards_info = res.get("data", {}).get("awards")
-        if not rewards_info:
-            logging.error(f"Could not obtain rewards info for {biz_name}:\n{login_info['message']}")
+        async with aiohttp.ClientSession() as session:
+            res = await session.get(login_const[biz_name]["reward_url"], headers=header)
+            res = await res.json()
+        res_data = res.get("data")
+        if not res_data:
+            logging.error(f"Could not obtain rewards info for {biz_name}. {res.get('message')}")
             continue
+        rewards_info = res_data.get("awards")
 
         # Claim daily reward
-        res = req.to_python(
-            req.request(
-                "post",
+        async with aiohttp.ClientSession() as session:
+            res = await session.post(
                 login_const[biz_name]["sign_url"],
                 headers=header,
                 data=json.dumps({"act_id": login_const[biz_name]["act_id"]}, ensure_ascii=False),
-            ).text
-        )
+            )
+            res = await res.json()
         code = res.get("retcode")
         data = res.get("data")
 
         if code == 0:
-            status = "Successfully claimed daily reward for today."
-        if login_info.get("is_sign") or code == -5003:
-            status = "Already claimed daily reward for today."
+            status = "Claimed daily reward for today :)"
         else:
-            status = f"Failed to check-in, return code {code}"
-            logging.error(f"{status}\n{res.get('message')}")
-            continue
+            if login_info.get("is_sign") or code == -5003:
+                status = "Already claimed daily reward for today :)"
+            else:
+                status = f"Failed to check-in :( return code {code}"
+                logging.error(f"{status}\n{res.get('message')}")
+
         if data and data.get("gt_result"):
             status = "Blocked by geetest captcha :("
             god_forsaken_geetest = data.get("gt_result")
             logging.error(f"{status}\n{json.dumps(god_forsaken_geetest)}")
-            continue
 
+        # Construct dict to return and use in Discord embed
         results[biz_name] = {
             "game_biz": biz_name,
             "game_uid": censored_uid,
@@ -167,22 +175,26 @@ def claim_daily_login(header: dict, games: list):
             "rewards": rewards_info,
             "sign_status": status,
         }
-
     return results
 
 
-def send_discord_embed(login_results, url):
+async def send_discord_embed(login_results, url, discord_id):
     """Construct and send Discord embed based on the result
 
     Args:
         login_results (dict): Result from the login function
         url (str): The URL of the Discord embed to send messages to
+        discord_id (str or None): The Discord ID of the user to ping in embed
     """
-    webhook = DiscordWebhook(url=url, rate_limit_retry=True)
+    webhook = AsyncDiscordWebhook(url=url, rate_limit_retry=True, allowed_mentions={"users": [discord_id]})
 
     for biz_name, data in login_results.items():
         game_const = login_const[biz_name]
         embed = DiscordEmbed(title=game_const["title"], color=game_const["color"])
+        if ":(" in data.get("sign_status"):
+            webhook.set_content(f"<@{discord_id}> <:TenshiPing:794247142411730954>" if discord_id else None)
+            embed.set_color(13762640)
+        embed.add_embed_field(name="Check-in result:", value=data["sign_status"], inline=False)
         rewards = data["rewards"]
         today = data["total_sign_day"] + 1
         today_reward = rewards[today]
@@ -198,12 +210,10 @@ def send_discord_embed(login_results, url):
         embed.add_embed_field(name="Server", value=data["region_name"])
         embed.add_embed_field(name="Today's rewards", value=f"{today_reward['name']} x {today_reward['cnt']}")
         embed.add_embed_field(name="Total Daily Check-In", value=str(today))
-        embed.add_embed_field(name="Check-in result:", value=data["sign_status"], inline=False)
         embed.set_timestamp()
-
         webhook.add_embed(embed)
 
-    response = webhook.execute()
+    response = await webhook.execute()
     if response.status_code == 200:
         logging.info("Successfully sent Discord embed")
     else:
@@ -233,11 +243,11 @@ async def main():
                 ),
                 "Referer": "https://act.hoyolab.com",
                 "Accept-Encoding": "gzip, deflate, br",
-                "Cookie": cookie,
+                "Cookie": re.sub(r"DISCORD_ID=\d+;", "", cookie).strip(),
             }
 
             # Verify if cookie is valid and account exist
-            account_info, retcode, msg = get_account_info(header=header)
+            account_info, retcode, msg = await get_account_info(header=header)
             if not account_info or retcode != 0:
                 logging.error(f"Cookie {index + 1}/{len(cookies)} invalid, verify if 'cookie_token' exist")
                 logging.error(f"Reason: {msg}")
@@ -246,14 +256,16 @@ async def main():
                 logging.info(f"Cookie {index + 1}/{len(cookies)} OK, Hello {account_info['account_name']}")
 
             # Get list of binded games
-            game_accounts = get_games_list(header=header)
+            game_accounts = await get_games_list(header=header)
             game_accounts = remove_duplicates_by_level(game_accounts.get("list"))
 
-            login_results = claim_daily_login(header=header, games=game_accounts)
+            login_results = await claim_daily_login(header=header, games=game_accounts)
 
             webhook_url = os.getenv("DISCORD_WEBHOOK", None)
             if webhook_url and login_results:
-                send_discord_embed(login_results, webhook_url)
+                match = re.match(r"DISCORD_ID=(\d+);", cookie)
+                discord_id = match.group(1) if match else None
+                await send_discord_embed(login_results, webhook_url, discord_id=discord_id)
 
         if os.getenv("RUN_ONCE", None):
             logging.info("Script executed successfully.")
