@@ -45,7 +45,9 @@ You can have the script notify on a Discord channel via webhook. On any channel 
 
 `Channel Settings > Integrations > Webhooks > New Webhook`
 
-You can also choose to use existing one by clicking on `Copy Webhook URL`
+You can also choose to use existing one by clicking on `Copy Webhook URL`.
+
+You can also configure the script to notify (ping) your Discord ID in case of a login failure. To do this, append `DISCORD_ID=1234567890; rest_of_cookie=; ...` at the start your cookie.
 
 ![image](https://raw.githubusercontent.com/raidensakura/hoyolab-auto-login/f0e36c3d39f6e9363b3c772e63ded57c5fbae8c8/images/5.png)
 
