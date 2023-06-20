@@ -10,6 +10,7 @@ import aiohttp
 import coloredlogs
 from discord_webhook import AsyncDiscordWebhook, DiscordEmbed
 from dotenv import load_dotenv
+from twocaptcha import TwoCaptcha
 
 from constants import login_const
 
@@ -34,7 +35,7 @@ def remove_duplicates_by_level(list_of_dicts):
         list_of_dicts (list_): List of games to remove duplicate game regions from
 
     Returns:
-        list: Games list with duplicate game regions removed
+        list: Games list with duplicate game but different region removed
     """
     unique_dicts = {}
 
@@ -104,8 +105,9 @@ async def claim_daily_login(header: dict, games: list):
         if biz_name not in login_const:
             logging.error(
                 f"Skipping game account {game['game_biz']} as it's currently not supported."
-                f"\nPlease open an issue on GitHub for it to be added."
+                f"\nPlease open an issue on GitHub or reach me on Discord."
                 f"\nhttps://github.com/raidensakura/hoyolab-auto-login/issues/new"
+                f"\nhttps://dsc.gg/transience"
             )
             continue
 
@@ -136,30 +138,114 @@ async def claim_daily_login(header: dict, games: list):
             continue
         rewards_info = res_data.get("awards")
 
-        # Claim daily reward
-        async with aiohttp.ClientSession() as session:
-            res = await session.post(
-                login_const[biz_name]["sign_url"],
-                headers=header,
-                data=json.dumps({"act_id": login_const[biz_name]["act_id"]}, ensure_ascii=False),
-            )
-            res = await res.json()
-        code = res.get("retcode")
-        data = res.get("data")
+        async def claim_daily_reward(challenge=None):
+            """Claim daily reward from game-specific endpoint
 
-        if code == 0:
-            status = "Claimed daily reward for today :)"
-        else:
-            if login_info.get("is_sign") or code == -5003:
-                status = "Already claimed daily reward for today :)"
+            Args:
+                challenge (dict, optional): Geetest challenge payload. Defaults to None.
+
+            Returns:
+                data (any): Data returned from the API, usually containing geetest payload
+                message (str): Response status message
+                code (int): Retcode from the response
+            """
+            if challenge:
+                header["x-rpc-challenge"] = challenge["geetest_challenge"]
+                header["x-rpc-seccode"] = challenge["geetest_seccode"]
+                header["x-rpc-validate"] = challenge["geetest_validate"]
+            async with aiohttp.ClientSession() as session:
+                res = await session.post(
+                    login_const[biz_name]["sign_url"],
+                    headers=header,
+                    data=json.dumps({"act_id": login_const[biz_name]["act_id"]}, ensure_ascii=False),
+                )
+                res = await res.json()
+            code = res.get("retcode")
+            message = res.get("message")
+            data = res.get("data")
+            logging.debug(f"login result: {code} {message}\n{data}")
+
+            return data, message, code
+
+        def solve_geetest(gt, challenge, url):
+            """Solve geetest verification returned by the server using 2captcha
+
+            Args:
+                gt (str): Whatever identifier this is
+                challenge (_type_): Whatever identifier this is
+                url (_type_): URL the challenge originated from
+
+            Returns:
+                dict: Result from the 2captcha API
+            """
+            api_key = os.getenv("2CAPTCHA_API")
+            if not api_key:
+                return
+            logging.info("Attempting to solve, this may take a while...")
+            solver = TwoCaptcha(api_key)
+            try:
+                result = solver.geetest(
+                    gt=gt,
+                    challenge=challenge,
+                    url=url,
+                )
+                # Added this since their API returned 521 when I did 2 requests close to each other
+                time.sleep(2.5)
+            except Exception as exc:
+                logging.error(f"Could not solve captcha: {exc}")
+                return
+            return result
+
+        # Function to verify request status and check if blocked by geetest
+        async def verify_login_status(challenge=None):
+            """Verify request status and check if blocked by geetest
+
+            Args:
+                challenge (dict, optional): Dict returned from the 2captcha API. Defaults to None.
+
+            Returns:
+                data (any): Data returned from the API, usually containing geetest payload
+                message (str): Response status message
+                code (int): Retcode from the response
+                status (str): Whether the login succeeded or not, contains :) if ok and :( if failed
+            """
+            data, message, code = await claim_daily_reward(challenge)
+            if code == 0:
+                status = "Claimed daily reward for today :)"
             else:
-                status = f"Failed to check-in :( return code {code}"
-                logging.error(f"{status}\n{res.get('message')}")
+                if login_info.get("is_sign") or code == -5003:
+                    status = "Already claimed daily reward for today :)"
+                else:
+                    status = f"Failed to check-in :( return code {code}"
+                    logging.error(f"{status}\n{message}")
 
-        if data and data.get("gt_result"):
-            status = "Blocked by geetest captcha :("
-            god_forsaken_geetest = data.get("gt_result")
-            logging.error(f"{status}\n{json.dumps(god_forsaken_geetest)}")
+            # if geetest is encountered
+            gt_result = data.get("gt_result") if data else None
+
+            if (
+                gt_result is not None
+                and gt_result.get("gt")
+                and gt_result.get("challenge")
+                and gt_result.get("is_risk")
+                and gt_result.get("risk_code") != 0
+                and gt_result.get("success") != 0
+            ):
+                status = "Blocked by geetest captcha :("
+                logging.error(f"{status}")
+                logging.debug(f"{json.dumps(gt_result)}")
+                gt = gt_result.get("gt")
+                challenge = gt_result.get("challenge")
+                url = login_const[biz_name]["sign_url"]
+                result = solve_geetest(gt, challenge, url)
+                if result and result.get("code"):
+                    logging.debug(f"solver result: {result}")
+                    # The API for whatever reason returns dict in str format so we have to convert that
+                    challenge = json.loads(result.get("code"))
+                    data, message, code, status = await verify_login_status(challenge=challenge)
+
+            return data, message, code, status
+
+        data, message, code, status = await verify_login_status()
 
         # Construct dict to return and use in Discord embed
         results[biz_name] = {
@@ -224,7 +310,7 @@ async def send_discord_embed(login_results, url, discord_id):
 async def main():
     cookie = os.getenv("COOKIE", None)
     if not cookie:
-        logging.error("Variable 'COOKIE' not found, please ensure that variable exist")
+        logging.critical("Variable 'COOKIE' not found, please ensure that variable exist")
         exit(0)
 
     cookies = cookie.split("#")

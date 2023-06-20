@@ -9,6 +9,7 @@ python-dotenv = "==1.0.0"
 aiohttp = "*"
 coloredlogs = "*"
 discord-webhook = {extras = ["async"], version = "*"}
+2captcha-python = "*"
 
 [dev-packages]
 black = "*"
