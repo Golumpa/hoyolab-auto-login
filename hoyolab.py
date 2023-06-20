@@ -4,12 +4,16 @@ import logging
 import os
 import re
 import sys
+import threading
 import time
 
 import aiohttp
 import coloredlogs
+import schedule
 from discord_webhook import AsyncDiscordWebhook, DiscordEmbed
 from dotenv import load_dotenv
+from python3_capsolver.gee_test import CaptchaResponseSer, GeeTest
+from pytz import timezone
 from twocaptcha import TwoCaptcha
 
 from constants import login_const
@@ -18,13 +22,7 @@ sys.dont_write_bytecode = True
 
 load_dotenv()
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(asctime)s] [%(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-
-coloredlogs.install()
+coloredlogs.install(level=os.getenv("LOG_LEVEL", "INFO"))
 
 
 def remove_duplicates_by_level(list_of_dicts):
@@ -163,11 +161,12 @@ async def claim_daily_login(header: dict, games: list):
             code = res.get("retcode")
             message = res.get("message")
             data = res.get("data")
-            logging.debug(f"login result: {code} {message}\n{data}")
-
+            logging.debug(f"login result: {code} {message}")
+            if data:
+                logging.debug(f"{data}")
             return data, message, code
 
-        def solve_geetest(gt, challenge, url):
+        async def solve_geetest(gt, challenge, url):
             """Solve geetest verification returned by the server using 2captcha
 
             Args:
@@ -178,21 +177,46 @@ async def claim_daily_login(header: dict, games: list):
             Returns:
                 dict: Result from the 2captcha API
             """
-            api_key = os.getenv("2CAPTCHA_API")
-            if not api_key:
-                return
-            logging.info("Attempting to solve, this may take a while...")
-            solver = TwoCaptcha(api_key)
-            try:
-                result = solver.geetest(
-                    gt=gt,
-                    challenge=challenge,
-                    url=url,
-                )
-                # Added this since their API returned 521 when I did 2 requests close to each other
-                time.sleep(2.5)
-            except Exception as exc:
-                logging.error(f"Could not solve captcha: {exc}")
+
+            def solve_using_2captcha(api_key):
+                solver = TwoCaptcha(api_key)
+                try:
+                    logging.info("Attempting to solve using 2captcha, this may take a while...")
+                    result = solver.geetest(
+                        gt=gt,
+                        challenge=challenge,
+                        url=url,
+                    )
+                    # Added this since their API returned 521 when I did 2 requests close to each other
+                    time.sleep(2.5)
+                except Exception as exc:
+                    logging.error(f"Could not solve captcha: {exc}")
+                    return
+                return result
+
+            async def solve_using_capsolver(api_key):
+                try:
+                    logging.info("Attempting to solve using capsolver, this may take a while...")
+                    result = await GeeTest(
+                        api_key=api_key,
+                        captcha_type="GeeTestTaskProxyLess",
+                        websiteURL=url,
+                        gt=gt,
+                        challenge=challenge,
+                    ).aio_captcha_handler()
+                except Exception as exc:
+                    logging.error(f"Could not solve captcha: {exc}")
+                    return
+                return result
+
+            if os.getenv("2CAPTCHA_API"):
+                api_key = os.getenv("2CAPTCHA_API")
+                result = solve_using_2captcha(api_key)
+            elif os.getenv("CAPSOLVER_API"):
+                api_key = os.getenv("CAPSOLVER_API")
+                result = await solve_using_capsolver(api_key)
+                logging.debug(f"capsolver stuff: {result}")
+            else:
                 return
             return result
 
@@ -232,13 +256,17 @@ async def claim_daily_login(header: dict, games: list):
             ):
                 status = "Blocked by geetest captcha :("
                 logging.error(f"{status}")
-                logging.debug(f"{json.dumps(gt_result)}")
                 gt = gt_result.get("gt")
                 challenge = gt_result.get("challenge")
                 url = login_const[biz_name]["sign_url"]
-                result = solve_geetest(gt, challenge, url)
-                if result and result.get("code"):
-                    logging.debug(f"solver result: {result}")
+                result = await solve_geetest(gt, challenge, url)
+                if isinstance(result, CaptchaResponseSer) and result.solution:
+                    logging.debug(f"Capsolver API result: {result}")
+                    # TODO: add more stuff here
+                elif isinstance(result, CaptchaResponseSer) and result.errorCode:
+                    logging.error(f"Capsolver API error: {result.errorCode} {result.errorDescription}")
+                elif result and result.get("code"):
+                    logging.debug(f"2captcha solver result: {result}")
                     # The API for whatever reason returns dict in str format so we have to convert that
                     challenge = json.loads(result.get("code"))
                     data, message, code, status = await verify_login_status(challenge=challenge)
@@ -353,18 +381,44 @@ async def main():
                 discord_id = match.group(1) if match else None
                 await send_discord_embed(login_results, webhook_url, discord_id=discord_id)
 
-        if os.getenv("RUN_ONCE", None):
+        if os.getenv("RUN_ONCE"):
             logging.info("Script executed successfully.")
             exit()
+
+        if os.getenv("SCHEDULE"):
+            logging.info("Current login cycle ended.")
+            return
 
         logging.info("Sleeping for a day...")
         time.sleep(86400)
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    try:
+
+    def login_task():
+        logging.debug("Running on thread %s" % threading.current_thread())
+        loop = asyncio.new_event_loop()
         loop.run_until_complete(main())
+
+    def run_threaded(job_func):
+        job_thread = threading.Thread(target=job_func)
+        job_thread.start()
+
+    try:
+        schedule_time = os.getenv("SCHEDULE")
+        tz = os.getenv("TIMEZONE") or "UTC"
+        if schedule_time:
+            logging.info(f"Script is now running, login task will run at {schedule_time} {tz}")
+            schedule.every().day.at(schedule_time, timezone(tz)).do(run_threaded, login_task)
+            while True:
+                schedule.run_pending()
+                time.sleep(1)
+        else:
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(main())
     except KeyboardInterrupt:
         logging.info("Received terminate signal, exiting...")
         exit()
+    except Exception as exc:
+        logging.error(f"{exc}")
+        exit(0)

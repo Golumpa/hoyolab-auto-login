@@ -60,6 +60,15 @@ This should either be left unset, or a value of `True`. Set it to `True` if you 
 
 </details>
 
+<details>
+<summary><b>(Optional) <code>SCHEDULE</code> on what time of the day the script will run at</b></summary>
+
+This should either be left unset, or a valid time format (`00:00` to `23:59`).
+You can also additionally specify the timezone in your env or leave the default as UTC, ex: `TIMEZONE=Asia/Kuala_Lumpur`.
+Refer to [List of tz database time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+
+</details>
+
 ## Installation
 
 <details>

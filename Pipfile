@@ -10,6 +10,10 @@ aiohttp = "*"
 coloredlogs = "*"
 discord-webhook = {extras = ["async"], version = "*"}
 2captcha-python = "*"
+install = "*"
+python3-capsolver = "*"
+schedule = "*"
+pytz = "*"
 
 [dev-packages]
 black = "*"
