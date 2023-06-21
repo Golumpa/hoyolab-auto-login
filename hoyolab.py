@@ -30,7 +30,7 @@ handler.setFormatter(
 
 logging = colorlog.getLogger(__name__)
 logging.addHandler(handler)
-logging.setLevel("DEBUG")
+logging.setLevel(os.getenv("LOG_LEVEL", "INFO"))
 
 
 def remove_duplicates_by_level(list_of_dicts):
