@@ -7,13 +7,13 @@ name = "pypi"
 requests = "==2.28.2"
 python-dotenv = "==1.0.0"
 aiohttp = "*"
-coloredlogs = "*"
 discord-webhook = {extras = ["async"], version = "*"}
 2captcha-python = "*"
 install = "*"
 python3-capsolver = "*"
 schedule = "*"
 pytz = "*"
+colorlog = "*"
 
 [dev-packages]
 black = "*"

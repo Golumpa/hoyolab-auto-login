@@ -1,6 +1,5 @@
 import asyncio
 import json
-import logging
 import os
 import re
 import sys
@@ -8,7 +7,7 @@ import threading
 import time
 
 import aiohttp
-import coloredlogs
+import colorlog
 import schedule
 from discord_webhook import AsyncDiscordWebhook, DiscordEmbed
 from dotenv import load_dotenv
@@ -22,7 +21,16 @@ sys.dont_write_bytecode = True
 
 load_dotenv()
 
-coloredlogs.install(level=os.getenv("LOG_LEVEL", "INFO"))
+handler = colorlog.StreamHandler()
+handler.setFormatter(
+    colorlog.ColoredFormatter(
+        fmt="%(asctime)s  %(log_color)s%(levelname)-8s%(reset)s | %(log_color)s%(message)s%(reset)s"
+    )
+)
+
+logging = colorlog.getLogger(__name__)
+logging.addHandler(handler)
+logging.setLevel("DEBUG")
 
 
 def remove_duplicates_by_level(list_of_dicts):
@@ -234,6 +242,7 @@ async def claim_daily_login(header: dict, games: list):
             """
             data, message, code = await claim_daily_reward(challenge)
             data, message, code, status = await verify_geetest(data, message, code)
+
             if code == 0:
                 status = "Claimed daily reward for today :)"
             elif not status:
@@ -247,8 +256,12 @@ async def claim_daily_login(header: dict, games: list):
         async def verify_geetest(data, message, code):
             gt_result = data.get("gt_result") if data else None
             user_uid = game.get("game_uid")
-            status = ""
-            error = None
+            status, error = "", None
+
+            if gt_result and (login_info.get("is_sign") or code == -5003):
+                status = "Encountered Geetest, but today's reward is already claimed :)"
+                logging.info(f"{status}")
+                return data, message, code, status
 
             if (
                 gt_result is not None
@@ -288,11 +301,16 @@ async def claim_daily_login(header: dict, games: list):
                     error = True
 
                 if error:
+                    # Skip retries if API keys not configured
+                    if not os.getenv("2CAPTCHA_API") and not os.getenv("CAPSOLVER_API"):
+                        status = "Blocked by geetest captcha :("
+                        logging.error(f"{status}")
+                        return data, message, code, status
                     if user_uid not in captcha_retries.keys():
                         captcha_retries[user_uid] = 1
                     captcha_retries[user_uid] += 1
                     if captcha_retries[user_uid] > 3:
-                        status = "Blocked by geetest captcha :("
+                        status = "Unable to solve geetest captcha :("
                         logging.error(f"{status}")
                     else:
                         logging.info(f"Retrying to solve the captcha (#{captcha_retries[user_uid]})")
