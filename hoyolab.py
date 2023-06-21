@@ -97,6 +97,7 @@ async def claim_daily_login(header: dict, games: list):
     """
 
     results = {}
+    captcha_retries = {}
 
     for game in games:
         biz_name = game["game_biz"]
@@ -215,14 +216,12 @@ async def claim_daily_login(header: dict, games: list):
             elif os.getenv("CAPSOLVER_API"):
                 api_key = os.getenv("CAPSOLVER_API")
                 result = await solve_using_capsolver(api_key)
-                logging.debug(f"capsolver stuff: {result}")
             else:
                 return
             return result
 
-        # Function to verify request status and check if blocked by geetest
         async def verify_login_status(challenge=None):
-            """Verify request status and check if blocked by geetest
+            """Attempt to claim the daily reward and verify its login status
 
             Args:
                 challenge (dict, optional): Dict returned from the 2captcha API. Defaults to None.
@@ -234,17 +233,22 @@ async def claim_daily_login(header: dict, games: list):
                 status (str): Whether the login succeeded or not, contains :) if ok and :( if failed
             """
             data, message, code = await claim_daily_reward(challenge)
+            data, message, code, status = await verify_geetest(data, message, code)
             if code == 0:
                 status = "Claimed daily reward for today :)"
-            else:
+            elif not status:
                 if login_info.get("is_sign") or code == -5003:
                     status = "Already claimed daily reward for today :)"
                 else:
                     status = f"Failed to check-in :( return code {code}"
                     logging.error(f"{status}\n{message}")
+            return data, message, code, status
 
-            # if geetest is encountered
+        async def verify_geetest(data, message, code):
             gt_result = data.get("gt_result") if data else None
+            user_uid = game.get("game_uid")
+            status = ""
+            error = None
 
             if (
                 gt_result is not None
@@ -254,22 +258,49 @@ async def claim_daily_login(header: dict, games: list):
                 and gt_result.get("risk_code") != 0
                 and gt_result.get("success") != 0
             ):
-                status = "Blocked by geetest captcha :("
-                logging.error(f"{status}")
                 gt = gt_result.get("gt")
                 challenge = gt_result.get("challenge")
                 url = login_const[biz_name]["sign_url"]
                 result = await solve_geetest(gt, challenge, url)
+
+                # If solution found on Capsolver
                 if isinstance(result, CaptchaResponseSer) and result.solution:
                     logging.debug(f"Capsolver API result: {result}")
-                    # TODO: add more stuff here
-                elif isinstance(result, CaptchaResponseSer) and result.errorCode:
-                    logging.error(f"Capsolver API error: {result.errorCode} {result.errorDescription}")
+                    challenge = {
+                        "geetest_challenge": result.solution.get("challenge"),
+                        "geetest_seccode": "",
+                        "geetest_validate": result.solution.get("validate"),
+                    }
+                    data, message, code = await claim_daily_reward(challenge=challenge)
+
+                # If solution found on 2captcha
                 elif result and result.get("code"):
                     logging.debug(f"2captcha solver result: {result}")
                     # The API for whatever reason returns dict in str format so we have to convert that
                     challenge = json.loads(result.get("code"))
-                    data, message, code, status = await verify_login_status(challenge=challenge)
+                    data, message, code = await claim_daily_reward(challenge=challenge)
+
+                # If error encountered
+                if isinstance(result, CaptchaResponseSer) and result.errorCode:
+                    error = True
+                    logging.error(f"Capsolver API error: {result.errorCode} {result.errorDescription}")
+                elif not result:
+                    error = True
+
+                if error:
+                    if user_uid not in captcha_retries.keys():
+                        captcha_retries[user_uid] = 1
+                    captcha_retries[user_uid] += 1
+                    if captcha_retries[user_uid] > 3:
+                        status = "Blocked by geetest captcha :("
+                        logging.error(f"{status}")
+                    else:
+                        logging.info(f"Retrying to solve the captcha (#{captcha_retries[user_uid]})")
+                        result = await verify_geetest(data, message, code)
+
+                # Remove retry count for the current UID
+                if user_uid in captcha_retries.keys():
+                    captcha_retries.pop(user_uid)
 
             return data, message, code, status
 
