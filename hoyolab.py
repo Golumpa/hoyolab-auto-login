@@ -287,7 +287,7 @@ async def claim_daily_login(header: dict, games: list):
                     data, message, code = await claim_daily_reward(challenge=challenge)
 
                 # If solution found on 2captcha
-                elif result and result.get("code"):
+                elif isinstance(result, dict) and result.get("code"):
                     logging.debug(f"2captcha solver result: {result}")
                     # The API for whatever reason returns dict in str format so we have to convert that
                     challenge = json.loads(result.get("code"))
