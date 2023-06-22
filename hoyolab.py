@@ -243,7 +243,7 @@ async def claim_daily_login(header: dict, games: list):
             data, message, code = await claim_daily_reward(challenge)
             data, message, code, status = await verify_geetest(data, message, code)
 
-            if code == 0:
+            if code == 0 and not status:
                 status = "Claimed daily reward for today :)"
             elif not status:
                 if login_info.get("is_sign") or code == -5003:
