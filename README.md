@@ -171,7 +171,7 @@ You are free to join my [Discord server](https://dsc.gg/transience) and post you
 
 ## Contributing
 
-When suggesting changes, please format your code with [black](https://pypi.org/project/black/) and [isort](https://pypi.org/project/isort/).
+When suggesting changes, please format your code with [black](https://pypi.org/project/black/) and [ruff](https://pypi.org/project/ruff/).
 
 Install dependencies and activate the pipenv with:
 
@@ -184,7 +184,12 @@ For formatting:
 
 ```python
 pipenv install --dev
-black . ; isort .
+black . ; ruff .
+```
+
+Or alternatively, you can also install pre-commit hooks which run the linters automatically on every commit
+```python
+pre-commit install
 ```
 
 For testing:
