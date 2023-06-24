@@ -169,6 +169,10 @@ There has been multiple repositories getting taken down due to violation of GitH
 - **I need specific help**  
 You are free to join my [Discord server](https://dsc.gg/transience) and post your question there. I'll reply when I'm free and try to help from what I know.
 
+## Updating
+
+If you're on a fork and want to keep it automatically updated, install and configure the [Pull App](https://github.com/apps/pull) for your repository.
+
 ## Contributing
 
 When suggesting changes, please format your code with [black](https://pypi.org/project/black/) and [ruff](https://pypi.org/project/ruff/).
