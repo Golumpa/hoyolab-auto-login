@@ -258,7 +258,7 @@ async def claim_daily_login(header: dict, games: list):
             user_uid = game.get("game_uid")
             status, error = "", None
 
-            if gt_result and (login_info.get("is_sign") or code == -5003):
+            if gt_result and (login_info.get("is_sign") is not False or code == -5003):
                 status = "Encountered Geetest, but today's reward is already claimed :)"
                 logging.info(f"{status}")
                 return data, message, code, status
