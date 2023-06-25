@@ -256,7 +256,7 @@ async def claim_daily_login(header: dict, games: list):
         async def verify_geetest(data, message, code):
             gt_result = data.get("gt_result") if data else None
             user_uid = game.get("game_uid")
-            status, error = "", None
+            status, error = None, None
 
             if gt_result and (login_info.get("is_sign") is not False or code == -5003):
                 status = "Encountered Geetest, but today's reward is already claimed :)"
@@ -312,8 +312,10 @@ async def claim_daily_login(header: dict, games: list):
                     if captcha_retries[user_uid] > 3:
                         status = "Unable to solve geetest captcha :("
                         logging.error(f"{status}")
+                        return data, message, code, status
                     else:
                         logging.info(f"Retrying to solve the captcha (#{captcha_retries[user_uid]})")
+                        data, message, code = await claim_daily_reward()
                         result = await verify_geetest(data, message, code)
 
                 # Remove retry count for the current UID
