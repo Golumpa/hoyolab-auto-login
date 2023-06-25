@@ -316,7 +316,7 @@ async def claim_daily_login(header: dict, games: list):
                     else:
                         logging.info(f"Retrying to solve the captcha (#{captcha_retries[user_uid]})")
                         data, message, code = await claim_daily_reward()
-                        result = await verify_geetest(data, message, code)
+                        data, message, code, status = await verify_geetest(data, message, code)
 
                 # Remove retry count for the current UID
                 if user_uid in captcha_retries.keys():
