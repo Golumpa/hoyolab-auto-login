@@ -190,7 +190,6 @@ async def claim_daily_login(header: dict, games: list):
             def solve_using_2captcha(api_key):
                 solver = TwoCaptcha(api_key)
                 try:
-                    logging.info("Attempting to solve using 2captcha, this may take a while...")
                     result = solver.geetest(
                         gt=gt,
                         challenge=challenge,
@@ -205,7 +204,6 @@ async def claim_daily_login(header: dict, games: list):
 
             async def solve_using_capsolver(api_key):
                 try:
-                    logging.info("Attempting to solve using capsolver, this may take a while...")
                     result = await GeeTest(
                         api_key=api_key,
                         captcha_type="GeeTestTaskProxyLess",
@@ -326,6 +324,15 @@ async def claim_daily_login(header: dict, games: list):
 
         data, message, code, status = await verify_login_status()
 
+        total_sign = login_info.get("total_sign_day")
+        if total_sign and code == -5003:
+            # If today's reward is already claimed
+            status = message
+        elif total_sign and (code == 0 and not data):
+            # Add 1 day into total checkin since
+            # we retrieve total login day first before logging in
+            total_sign += 1
+
         # Construct dict to return and use in Discord embed
         results[biz_name] = {
             "game_biz": biz_name,
@@ -333,7 +340,7 @@ async def claim_daily_login(header: dict, games: list):
             "nickname": game.get("nickname"),
             "level": game.get("level"),
             "region_name": game.get("region_name"),
-            "total_sign_day": login_info.get("total_sign_day") + 1,
+            "total_sign_day": total_sign,
             "today": login_info.get("today"),
             "is_sign": login_info.get("is_sign"),
             "first_bind": login_info.get("first_bind"),
@@ -361,7 +368,8 @@ async def send_discord_embed(login_results, url, discord_id):
             embed.set_color(13762640)
         embed.add_embed_field(name="Check-in result:", value=data["sign_status"], inline=False)
         rewards = data["rewards"]
-        today = data["total_sign_day"] + 1
+        # Minus 1 since list index start from 0
+        today = data["total_sign_day"] - 1
         today_reward = rewards[today]
         embed.set_thumbnail(url=today_reward["icon"])
         embed.set_author(
