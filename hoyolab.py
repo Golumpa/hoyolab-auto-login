@@ -325,10 +325,10 @@ async def claim_daily_login(header: dict, games: list):
         data, message, code, status = await verify_login_status()
 
         total_sign = login_info.get("total_sign_day")
-        if total_sign and code == -5003:
+        if total_sign and (code == -5003 or login_info.get("is_sign") is True):
             # If today's reward is already claimed
-            status = message
-        elif total_sign and (code == 0 and not data):
+            pass
+        elif total_sign and code == 0 and not data and login_info.get("is_sign") is False:
             # Add 1 day into total checkin since
             # we retrieve total login day first before logging in
             total_sign += 1
@@ -368,9 +368,9 @@ async def send_discord_embed(login_results, url, discord_id):
             embed.set_color(13762640)
         embed.add_embed_field(name="Check-in result:", value=data["sign_status"], inline=False)
         rewards = data["rewards"]
-        # Minus 1 since list index start from 0
-        today = data["total_sign_day"] - 1
-        today_reward = rewards[today]
+        today = data["total_sign_day"]
+        # Minus 1 since list index starts from 0
+        today_reward = rewards[today - 1]
         embed.set_thumbnail(url=today_reward["icon"])
         embed.set_author(
             name=game_const["author_name"],
