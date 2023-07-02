@@ -328,7 +328,7 @@ async def claim_daily_login(header: dict, games: list):
         if isinstance(total_sign, int) and (code == -5003 or login_info.get("is_sign") is True):
             # If today's reward is already claimed
             pass
-        elif isinstance(total_sign, int) and code == 0 and not data and login_info.get("is_sign") is False:
+        else:
             # Add 1 day into total checkin since
             # we retrieve total login day first before logging in
             total_sign += 1
