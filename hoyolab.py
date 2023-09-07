@@ -442,14 +442,14 @@ async def main():
             game_accounts = remove_duplicates_by_level(game_accounts.get("list"))
 
             # Parse excluded games into list
-            match: re.Match = re.match(r"EXCLUDE_LOGIN=([^;]+);", cookie)
+            match: re.Match = re.search(r"EXCLUDE_LOGIN=([^;]+);", cookie)
             exclude_game = re.split(r"\s*,\s*", match.group(1)) if match else None
 
             login_results = await claim_daily_login(header=header, games=game_accounts, exclude=exclude_game)
 
             webhook_url = os.getenv("DISCORD_WEBHOOK", None)
             if webhook_url and login_results:
-                match = re.match(r"DISCORD_ID=(\d+);", cookie)
+                match = re.search(r"DISCORD_ID=(\d+);", cookie)
                 discord_id = match.group(1) if match else None
                 await send_discord_embed(login_results, webhook_url, discord_id=discord_id)
 
