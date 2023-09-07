@@ -93,7 +93,7 @@ async def get_games_list(header: dict):
     return games.get("data")
 
 
-async def claim_daily_login(header: dict, games: list):
+async def claim_daily_login(header: dict, games: list, exclude: list):
     """Iterate through game list and claim daily login
 
     Args:
@@ -116,6 +116,10 @@ async def claim_daily_login(header: dict, games: list):
                 f"\nhttps://github.com/raidensakura/hoyolab-auto-login/issues/new"
                 f"\nhttps://dsc.gg/transience"
             )
+            continue
+
+        if biz_name in exclude:
+            logging.info(f"Skipping login for {biz_name}")
             continue
 
         censored_uid = "x" * 4 + game["game_uid"][4:]
@@ -408,6 +412,11 @@ async def main():
         """
 
         for index, cookie in enumerate(cookies):
+
+            # Strip internal vars from cookie
+            header_cookie = re.sub(r"DISCORD_ID=\d+;", "", cookie)
+            header_cookie = re.sub(r"EXCLUDE_LOGIN=([^;]+);", "", cookie)
+
             # Initialize header
             header = {
                 "User-Agent": os.getenv(
@@ -416,7 +425,7 @@ async def main():
                 ),
                 "Referer": "https://act.hoyolab.com",
                 "Accept-Encoding": "gzip, deflate, br",
-                "Cookie": re.sub(r"DISCORD_ID=\d+;", "", cookie).strip(),
+                "Cookie": header_cookie,
             }
 
             # Verify if cookie is valid and account exist
@@ -432,7 +441,11 @@ async def main():
             game_accounts = await get_games_list(header=header)
             game_accounts = remove_duplicates_by_level(game_accounts.get("list"))
 
-            login_results = await claim_daily_login(header=header, games=game_accounts)
+            # Parse excluded games into list
+            match: re.Match = re.match(r"EXCLUDE_LOGIN=([^;]+);", cookie)
+            exclude_game = re.split(r"\s*,\s*", match.group(1)) if match else None
+
+            login_results = await claim_daily_login(header=header, games=game_accounts, exclude=exclude_game)
 
             webhook_url = os.getenv("DISCORD_WEBHOOK", None)
             if webhook_url and login_results:
@@ -479,5 +492,5 @@ if __name__ == "__main__":
         logging.info("Received terminate signal, exiting...")
         exit()
     except Exception as exc:
-        logging.error(f"{exc}")
+        logging.exception(exc)
         exit(0)
