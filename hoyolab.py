@@ -118,7 +118,7 @@ async def claim_daily_login(header: dict, games: list, exclude: list):
             )
             continue
 
-        if biz_name in exclude:
+        if isinstance(exclude, list) and biz_name in exclude:
             logging.info(f"Skipping login for {biz_name}")
             continue
 
