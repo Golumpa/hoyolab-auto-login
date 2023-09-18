@@ -157,9 +157,11 @@ Example:
 ```COOKIE1#COOKIE2#COOKIE3```
 
 - **My `cookie_token` is missing!**  
-Try logging out and logging back in into your Hoyolab account. If it still doesn't work, try getting it from the code redemption page instead:
-  * [Genshin Impact](https://genshin.hoyoverse.com/en/gift)
-  * [Honkai: Star Rail](https://hsr.hoyoverse.com/gift)
+Try logging out and logging back in into your Hoyolab account. If it still doesn't work, try getting it from the code redemption or daily sign-in webpage instead:
+  * Genshin Impact - [Code Redemption](https://genshin.hoyoverse.com/en/gift) | [Daily Sign-in](https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481)
+  * Honkai: Star Rail - [Code Redemption](https://hsr.hoyoverse.com/gift) | [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311)
+  * Honkai Impact 3 - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin-bh3/index.html?act_id=e202110291205111)
+  * Tears of Themis - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/nxx/index.html?act_id=e202202281857121)
 
 - **Why aren't you using GitHub Actions?**  
 There has been multiple repositories getting taken down due to violation of GitHub's Terms of Service. Unfortunately, due to the nature of this script (which counts as account automation), it's better safe than sorry. Again, as a disclaimer, **I take no responsibility of the security and safety of your account by using this script**.
