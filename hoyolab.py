@@ -191,7 +191,7 @@ async def main():
             # claim daily reward for each game
             for game, details in game_accounts.items():
                 game_type = supported_logins.get(game)
-                if game in exclude_game:
+                if exclude_game and game in exclude_game:
                     logger.info(f"{cookie_num} Skipping login for {game}")
                     continue
                 elif game_type is None:
@@ -210,7 +210,7 @@ async def main():
                         ] = f"✅ Already claimed for {details.nickname} (UID {str(details.uid).replace(str(details.uid)[:5], 'xxxxx')})"
                         break
                     except genshin.errors.GeetestTriggered as exc:
-                        logger.info(f"Geetest triggered for {game}")
+                        logger.info(f"{cookie_num} Geetest triggered for {game}")
                         solved, error = await solve_geetest(
                             gt=exc.gt, challenge=exc.challenge, url="https://hoyolab.com"
                         )
@@ -220,15 +220,17 @@ async def main():
                             rewards[game] = f"✅ Claimed {reward.amount}x {reward.name}"
                             break
                         else:
-                            logger.error(f"Attempt {tries}/{max_retries} failed: {error}")
+                            logger.error(f"{cookie_num} Attempt {tries}/{max_retries} failed: {error}")
+                            if tries == max_retries - 1:
+                                rewards[game] = "❌ Unable to solve Geetest captcha"
                             continue
                     except Exception as exc:
                         err = f"Login failed for {game}: {exc}"
-                        logger.error(err)
+                        logger.error(f"{cookie_num} {err}")
                         rewards["errors"].append(err)
                         break
                     else:
-                        logger.info(f"Claimed {reward.amount}x {reward.name}")
+                        logger.info(f"{cookie_num} Claimed {reward.amount}x {reward.name}")
                         rewards[game] = f"{reward.amount}x {reward.name}"
                         break
 
