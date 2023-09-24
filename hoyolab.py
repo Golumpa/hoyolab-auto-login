@@ -55,9 +55,7 @@ logger.addHandler(ch)
 logger.propagate = False
 
 
-async def send_discord_embed(
-    login_results: dict(), url: str, discord_id: int, account_details: dict, cookie_num: str
-):
+async def send_discord_embed(login_results: dict(), url: str, discord_id: int, cookie_num: str):
     webhook = AsyncDiscordWebhook(
         url=url,
         username="Hoyolab Auto Login",
@@ -143,7 +141,79 @@ async def solve_geetest(gt: str, challenge: str, url: str):
     return result, error
 
 
-async def main():
+async def claim_daily_reward(
+    cookie_num: str, client: genshin.Client, game_accounts: list, exclude_game: list
+):
+    supported_logins = {
+        "hk4e_global": genshin.Game.GENSHIN,
+        "bh3_global": genshin.Game.HONKAI,
+        "hkrpg_global": genshin.Game.STARRAIL,
+    }
+
+    rewards = {}
+    rewards["errors"] = []
+
+    # claim daily reward for each game
+    for game, details in game_accounts.items():
+        game_type = supported_logins.get(game)
+        if exclude_game and game in exclude_game:
+            logger.info(f"{cookie_num} Skipping login for {game}")
+            continue
+        elif game_type is None:
+            logger.info(f"{cookie_num} Account for {game} is unsupported, skipping login")
+            continue
+
+        censored_uid = str(details.uid).replace(str(details.uid)[:5], "xxxxx")
+
+        # Max of 3 retries for captcha solve failure
+        max_retries = 3
+        for tries in range(max_retries):
+            try:
+                reward = await client.claim_daily_reward(game=game_type)
+            except genshin.AlreadyClaimed:
+                logger.info(f"{cookie_num} Daily reward already claimed for {game}")
+                rewards[game] = f"✅ Already claimed for {details.nickname} (UID {censored_uid})"
+                break
+            except genshin.errors.GeetestTriggered as exc:
+                logger.info(f"{cookie_num} Geetest triggered for {game}")
+                solved, error = await solve_geetest(
+                    gt=exc.gt, challenge=exc.challenge, url="https://hoyolab.com"
+                )
+                if solved:
+                    reward = await client.claim_daily_reward(game=game_type, challenge=solved)
+                    logger.info(f"{cookie_num} Claimed {reward.amount}x {reward.name}")
+                    rewards[game] = (
+                        f"✅ Claimed {reward.amount}x {reward.name}"
+                        f" for {details.nickname} (UID {censored_uid})"
+                    )
+                    break
+                else:
+                    logger.error(f"{cookie_num} Attempt {tries}/{max_retries} failed: {error}")
+            except Exception as exc:
+                err = f"Login failed for {game}: {exc}"
+                logger.error(f"{cookie_num} {err}")
+                rewards["errors"].append(err)
+                break
+            else:
+                logger.info(f"{cookie_num} Claimed {reward.amount}x {reward.name}")
+                rewards[game] = (
+                    f"✅ Claimed {reward.amount}x {reward.name}"
+                    f" for {details.nickname} (UID {censored_uid})"
+                )
+                break
+        # All retries exhausted
+        else:
+            logger.error(f"{cookie_num} Unable to solve Geetest for {game}, skipping login")
+            rewards["errors"].append(f"❌ Unable to solve Geetest captcha for {game}")
+
+    return rewards
+
+
+async def redeem_game_code(cookie_num: str, client: genshin.Client, game_accounts: list, exclude_game: list):
+    pass
+
+
+async def main(redeem_reward: bool = False, redeem_code: bool = False):
     cookie = os.getenv("COOKIE", None)
     if not cookie:
         logger.critical("You forgot to give me one or more cookies 🍪")
@@ -179,74 +249,36 @@ async def main():
             match: re.Match = re.search(r"EXCLUDE_LOGIN=([^;]+);", cookie)
             exclude_game = re.split(r"\s*,\s*", match.group(1)) if match else None
 
-            supported_logins = {
-                "hk4e_global": genshin.Game.GENSHIN,
-                "bh3_global": genshin.Game.HONKAI,
-                "hkrpg_global": genshin.Game.STARRAIL,
-            }
+            rewards = (
+                await claim_daily_reward(
+                    cookie_num=cookie_num,
+                    client=client,
+                    game_accounts=game_accounts,
+                    exclude_game=exclude_game,
+                )
+                if redeem_reward is True
+                else None
+            )
 
-            rewards = {}
-            rewards["errors"] = []
-
-            # claim daily reward for each game
-            for game, details in game_accounts.items():
-                game_type = supported_logins.get(game)
-                if exclude_game and game in exclude_game:
-                    logger.info(f"{cookie_num} Skipping login for {game}")
-                    continue
-                elif game_type is None:
-                    logger.info(f"{cookie_num} Account for {game} is unsupported, skipping login")
-                    continue
-
-                # Max of 3 retries for captcha solve failure
-                max_retries = 3
-                for tries in range(max_retries):
-                    try:
-                        reward = await client.claim_daily_reward(game=game_type)
-                    except genshin.AlreadyClaimed:
-                        logger.info(f"{cookie_num} Daily reward already claimed for {game}")
-                        rewards[
-                            game
-                        ] = f"✅ Already claimed for {details.nickname} (UID {str(details.uid).replace(str(details.uid)[:5], 'xxxxx')})"
-                        break
-                    except genshin.errors.GeetestTriggered as exc:
-                        logger.info(f"{cookie_num} Geetest triggered for {game}")
-                        solved, error = await solve_geetest(
-                            gt=exc.gt, challenge=exc.challenge, url="https://hoyolab.com"
-                        )
-                        if solved:
-                            reward = await client.claim_daily_reward(game=game_type, challenge=solved)
-                            logger.info(f"{cookie_num} Claimed {reward.amount}x {reward.name}")
-                            rewards[game] = f"✅ Claimed {reward.amount}x {reward.name}"
-                            break
-                        else:
-                            logger.error(f"{cookie_num} Attempt {tries}/{max_retries} failed: {error}")
-                            if tries == max_retries - 1:
-                                rewards[game] = "❌ Unable to solve Geetest captcha"
-                            continue
-                    except Exception as exc:
-                        err = f"Login failed for {game}: {exc}"
-                        logger.error(f"{cookie_num} {err}")
-                        rewards["errors"].append(err)
-                        break
-                    else:
-                        logger.info(f"{cookie_num} Claimed {reward.amount}x {reward.name}")
-                        rewards[game] = f"{reward.amount}x {reward.name}"
-                        break
-
-                # All retries exhausted
-                else:
-                    logger.error("Failed to solve Geetest captcha, skipping login")
+            codes = (
+                await redeem_game_code(
+                    cookie_num=cookie_num,
+                    client=client,
+                    game_accounts=game_accounts,
+                    exclude_game=exclude_game,
+                )
+                if redeem_code is True
+                else None
+            )
 
             webhook_url = os.getenv("DISCORD_WEBHOOK", None)
-            if webhook_url and rewards:
+            if webhook_url and rewards or codes:
                 match = re.search(r"DISCORD_ID=(\d+);", cookie)
                 discord_id = match.group(1) if match else None
                 await send_discord_embed(
                     rewards,
                     webhook_url,
                     discord_id=discord_id,
-                    account_details=details,
                     cookie_num=cookie_num,
                 )
 
@@ -266,7 +298,7 @@ if __name__ == "__main__":
     def login_task():
         logger.debug("Running on %s" % threading.current_thread())
         loop = asyncio.new_event_loop()
-        loop.run_until_complete(main())
+        loop.run_until_complete(main(redeem_reward=True))
 
     def run_threaded(job_func):
         job_thread = threading.Thread(target=job_func)
@@ -286,7 +318,7 @@ if __name__ == "__main__":
                 time.sleep(1)
         else:
             loop = asyncio.get_event_loop()
-            loop.run_until_complete(main())
+            loop.run_until_complete(main(redeem_reward=True))
     except KeyboardInterrupt:
         logger.info("Received terminate signal, exiting...")
         exit()
