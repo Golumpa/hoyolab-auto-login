@@ -55,17 +55,17 @@ logger.addHandler(ch)
 logger.propagate = False
 
 
-async def send_discord_embed(login_results: dict(), url: str, discord_id: int, cookie_num: str):
+async def send_discord_embed(webhook_url: str, discord_id: int, cookie_num: str, rewards: dict() = None):
     webhook = AsyncDiscordWebhook(
-        url=url,
+        url=webhook_url,
         username="Hoyolab Auto Login",
         avatar_url="https://avatars.githubusercontent.com/u/38610216?size=128",
         rate_limit_retry=True,
         allowed_mentions={"users": [discord_id]},
     )
     embed = DiscordEmbed(
-        title=f"Login Result for Cookie {cookie_num}",
-        color="E86D82" if login_results.get("errors") else "A385DE",
+        title=f"Login / Redemption Result for Cookie {cookie_num}",
+        color="E86D82" if rewards and rewards.get("errors") else "A385DE",
     )
     embed.set_thumbnail(url="https://media.discordapp.net/stickers/1098094222432800909.webp?size=160")
 
@@ -75,23 +75,21 @@ async def send_discord_embed(login_results: dict(), url: str, discord_id: int, c
         "hkrpg_global": "Honkai: Star Rail",
     }
 
-    if login_results.get("errors"):
+    if rewards and rewards.get("errors"):
         webhook.set_content(
             f"There was an error while running your script, <@{discord_id}> <:TenshiPing:794247142411730954>"
             if discord_id
             else ""
         )
 
-    for biz_name, data in login_results.items():
-        if biz_name == "errors":
-            if data:
+    if rewards:
+        for biz_name, data in rewards.items():
+            if biz_name == "errors" and data:
                 embed.add_embed_field(
-                    name="Error(s) encountered" or "-", value="\n".join(str(x) for x in data), inline=False
+                    name="Error(s) encountered", value="\n".join(str(x) for x in data), inline=False
                 )
-        else:
-            embed.add_embed_field(
-                name=proper_game_names.get(biz_name) or "-", value=data or "-", inline=False
-            )
+            else:
+                embed.add_embed_field(name=proper_game_names.get(biz_name), value=data, inline=False)
 
     webhook.add_embed(embed)
 
@@ -276,8 +274,8 @@ async def main(redeem_reward: bool = False, redeem_code: bool = False):
                 match = re.search(r"DISCORD_ID=(\d+);", cookie)
                 discord_id = match.group(1) if match else None
                 await send_discord_embed(
-                    rewards,
-                    webhook_url,
+                    rewards=rewards,
+                    webhook_url=webhook_url,
                     discord_id=discord_id,
                     cookie_num=cookie_num,
                 )
