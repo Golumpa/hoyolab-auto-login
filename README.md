@@ -8,7 +8,7 @@
   <a href="https://dsc.gg/transience/"><img src="https://discord.com/api/guilds/616969119685935162/widget.png"></a>
   <a href="https://ko-fi.com/P5P6D65UW">
   	<img alt="Static Badge" src="https://img.shields.io/badge/ko--fi.com%2Fraidensakura-d11df9?logo=kofi&logoColor=white&label=Support%20me&color=%23ff5b62">
-  </a><br>
+  </a>
 </h1>
 
 <p align="center">

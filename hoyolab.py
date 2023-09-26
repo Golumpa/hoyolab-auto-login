@@ -75,21 +75,22 @@ async def send_discord_embed(webhook_url: str, discord_id: int, cookie_num: str,
         "hkrpg_global": "Honkai: Star Rail",
     }
 
-    if rewards and rewards.get("errors"):
+    if not rewards:
+        return
+
+    if rewards.get("errors"):
         webhook.set_content(
             f"There was an error while running your script, <@{discord_id}> <:TenshiPing:794247142411730954>"
             if discord_id
             else ""
         )
+        embed.add_embed_field(
+            name="Error(s) encountered", value="\n".join(str(x) for x in rewards.get("errors")), inline=False
+        )
 
-    if rewards:
-        for biz_name, data in rewards.items():
-            if biz_name == "errors" and data:
-                embed.add_embed_field(
-                    name="Error(s) encountered", value="\n".join(str(x) for x in data), inline=False
-                )
-            else:
-                embed.add_embed_field(name=proper_game_names.get(biz_name), value=data, inline=False)
+    for biz_name, data in rewards.items():
+        if biz_name != "errors":
+            embed.add_embed_field(name=proper_game_names.get(biz_name), value=data, inline=False)
 
     webhook.add_embed(embed)
 
@@ -126,7 +127,7 @@ async def solve_geetest(gt: str, challenge: str, url: str):
             ).aio_captcha_handler()
             return result
         except Exception as exc:
-            error = f"2captcha attempt failed: {exc}"
+            error = f"Capsolver attempt failed: {exc}"
             logger.error(error)
         return result, error or None
 
@@ -158,7 +159,7 @@ async def claim_daily_reward(
             logger.info(f"{cookie_num} Skipping login for {game}")
             continue
         elif game_type is None:
-            logger.info(f"{cookie_num} Account for {game} is unsupported, skipping login")
+            logger.warning(f"{cookie_num} Account for {game} is unsupported, skipping login")
             continue
 
         censored_uid = str(details.uid).replace(str(details.uid)[:5], "xxxxx")
@@ -177,28 +178,20 @@ async def claim_daily_reward(
                 solved, error = await solve_geetest(
                     gt=exc.gt, challenge=exc.challenge, url="https://hoyolab.com"
                 )
-                if solved:
-                    reward = await client.claim_daily_reward(game=game_type, challenge=solved)
-                    logger.info(f"{cookie_num} Claimed {reward.amount}x {reward.name}")
-                    rewards[game] = (
-                        f"✅ Claimed {reward.amount}x {reward.name}"
-                        f" for {details.nickname} (UID {censored_uid})"
-                    )
-                    break
-                else:
+                if not solved or error:
                     logger.error(f"{cookie_num} Attempt {tries}/{max_retries} failed: {error}")
+                    continue
+                reward = await client.claim_daily_reward(game=game_type, challenge=solved)
             except Exception as exc:
                 err = f"Login failed for {game}: {exc}"
                 logger.error(f"{cookie_num} {err}")
                 rewards["errors"].append(err)
                 break
-            else:
-                logger.info(f"{cookie_num} Claimed {reward.amount}x {reward.name}")
-                rewards[game] = (
-                    f"✅ Claimed {reward.amount}x {reward.name}"
-                    f" for {details.nickname} (UID {censored_uid})"
-                )
-                break
+            logger.info(f"{cookie_num} Claimed {reward.amount}x {reward.name}")
+            rewards[game] = (
+                f"✅ Claimed {reward.amount}x {reward.name}" f" for {details.nickname} (UID {censored_uid})"
+            )
+            break
         # All retries exhausted
         else:
             logger.error(f"{cookie_num} Unable to solve Geetest for {game}, skipping login")
