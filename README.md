@@ -2,24 +2,42 @@
 
 <h1 align="center">
   <img src="https://imgur.com/L54eATql.png">
-  <p><b>Hoyolab Auto Daily Check-in</b></p>
-  <a href="https://github.com/raidensakura"><img src="https://img.shields.io/badge/hoyolab--auto--login-by%20Raiden-d11df9"></a>
+  <p><b>Hoyolab Auto Login</b></p>
+  <img alt="Static Badge" src="https://img.shields.io/badge/3.10_--_3.11-red?logo=python&logoColor=white&label=Python&labelColor=%233772a2&color=%23ffdd54">
   <a href="[https://github.com/raidensakura](https://github.com/python/black)"><img src="https://img.shields.io/badge/code%20style-black-1c1c1c.svg"></a>
-  <a href="https://dsc.gg/transience/"><img src="https://discord.com/api/guilds/616969119685935162/widget.png"></a><br>
-  <a href="https://ko-fi.com/P5P6D65UW"><img src="https://ko-fi.com/img/githubbutton_sm.svg"></a>
+  <a href="https://dsc.gg/transience/"><img src="https://discord.com/api/guilds/616969119685935162/widget.png"></a>
+  <a href="https://ko-fi.com/P5P6D65UW">
+  	<img alt="Static Badge" src="https://img.shields.io/badge/ko--fi.com%2Fraidensakura-d11df9?logo=kofi&logoColor=white&label=Support%20me&color=%23ff5b62">
+  </a>
 </h1>
+
+<p align="center">
+  <a href="#overview">Overview</a>
+  •
+  <a href="#requirements">Requirements</a>
+  •
+  <a href="#installation">Installation</a>
+  •
+  <a href="#common-questions">Common Questions</a>
+  •
+  <a href="#updating">Updating</a>
+  •
+  <a href="#contributing">Contributing</a>
+</p>
 
 ## Overview
 
-A simple program that allows you to always claim Hoyolab's daily login system for Hoyoverse games. Script was originally made by [vermaysha/Hoyolab-Auto-Daily-Checkin](https://github.com/vermaysha/Hoyolab-Auto-Daily-Checkin), but since the original repository is archived I decided to fork and maintain it myself, along with some improvements and installation guide.
+A simple program to always claim Hoyolab's daily login system for Hoyoverse games. Script was originally made by [vermaysha/Hoyolab-Auto-Daily-Checkin](https://github.com/vermaysha/Hoyolab-Auto-Daily-Checkin), but since the original repository is archived I decided to fork and maintain it myself, along with some improvements and installation guide.
 
-**Features:**
+### **Features:**
 
-1. Send notification to Discord channel
-2. Multiple accounts detection
-3. Lightweight
+- Supports multiple Hoyolab accounts
+- Supports multiple game accounts
+- Supports Geetest solving service (2captcha / Capsolver)
+- Send Discord notification
+- Configurable schedule
 
-## What you need
+## Requirements
 
 <details>
 <summary><b>Hoyolab account cookie (<code>COOKIE</code>)</b></summary>
@@ -27,14 +45,6 @@ A simple program that allows you to always claim Hoyolab's daily login system fo
 Navigate to [Hoyolab website](https://www.hoyolab.com/) with your account logged in, open developer tools on your browser (F12 for Firefox/Chrome), navigate to Console tab, enter `document.cookie` in, and copy the long-string text output without the quotation marks.
 
 ![image](https://raw.githubusercontent.com/raidensakura/hoyolab-auto-login/f0e36c3d39f6e9363b3c772e63ded57c5fbae8c8/images/3.png)
-
-</details>
-
-<details>
-<summary><b>Browser agent (<code>USER_AGENT</code>)</b></summary>
-
-You can get your user agent by just simply typing it in your search engine (Google/DuckDuckGo)  
-![image](https://raw.githubusercontent.com/raidensakura/hoyolab-auto-login/f0e36c3d39f6e9363b3c772e63ded57c5fbae8c8/images/4.png)
 
 </details>
 
@@ -135,9 +145,9 @@ In addition to hosting your applications, [Northflank](https://northflank.com/pr
 
 </details>
 
-## FAQ
+## Common Questions
 
-- **Which platform do I choose??**  
+- **Which platform do I choose?**  
 If you have no payment card for verification - Zeabur.  
 If you want simple UI and don't mind upgrading to their developer plan - Railway.  
 If you don't want your script to run constantly - Northflank.  
@@ -146,8 +156,7 @@ If you don't want your script to run constantly - Northflank.
 The supported games for now are:
   - Honkai Impact 3rd  
   - Genshin Impact  
-  - Honkai: Star Rail  
-  - Tears of Themis  
+  - Honkai: Star Rail   
 
   If you've binded those game accounts to your Hoyolab account, it will claim the daily login in all of them.
 
@@ -164,10 +173,10 @@ Try logging out and logging back in into your Hoyolab account. If it still doesn
   * Tears of Themis - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/nxx/index.html?act_id=e202202281857121)
 
 - **Why aren't you using GitHub Actions?**  
-There has been multiple repositories getting taken down due to violation of GitHub's Terms of Service. Unfortunately, due to the nature of this script (which counts as account automation), it's better safe than sorry. Again, as a disclaimer, **I take no responsibility of the security and safety of your account by using this script**.
+It may lead to this repository getting taken down by GitHub for violation of their Terms of Service.  
 
-- **I need specific help**  
-You are free to join my [Discord server](https://dsc.gg/transience) and post your question there. I'll reply when I'm free and try to help from what I know.
+- **It's something else**  
+Feel free to join my [Discord server](https://dsc.gg/transience) and post your question there. I'll try to reply as soon as I can.
 
 ## Updating
 
