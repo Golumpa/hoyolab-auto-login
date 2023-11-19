@@ -165,10 +165,10 @@ Add a `#` between your cookies.<br><br>
 Example:  
 ```COOKIE1#COOKIE2#COOKIE3```
 
-- **I'm getting invalid cookie error**  
-Try logging out and logging back in into your Hoyolab account. If it still doesn't work, try getting it from the code redemption or daily sign-in page instead:
-  * Genshin Impact - [Daily Sign-in](https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481)
-  * Honkai: Star Rail - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311)
+- **My `cookie_token` is missing!**  
+Try logging out and logging back in into your Hoyolab account. If it still doesn't work, try getting it from the code redemption or daily sign-in webpage instead:
+  * Genshin Impact - [Code Redemption](https://genshin.hoyoverse.com/en/gift) | [Daily Sign-in](https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481)
+  * Honkai: Star Rail - [Code Redemption](https://hsr.hoyoverse.com/gift) | [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311)
   * Honkai Impact 3 - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin-bh3/index.html?act_id=e202110291205111)
   * Tears of Themis - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/nxx/index.html?act_id=e202202281857121)
 
