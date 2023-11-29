@@ -1,5 +1,3 @@
-__version__ = "1.0.0"
-
 import asyncio
 import logging
 import os
@@ -12,7 +10,6 @@ import genshin
 import schedule
 from discord_webhook import AsyncDiscordWebhook, DiscordEmbed
 from dotenv import load_dotenv
-from python3_capsolver.gee_test import GeeTest
 from pytz import timezone
 from twocaptcha import TwoCaptcha
 
@@ -20,77 +17,93 @@ sys.dont_write_bytecode = True
 
 load_dotenv()
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+)
+logger = logging.getLogger("HAL")
+
+# Load environment variables
+COOKIE = os.getenv("COOKIE")
+DISCORD_WEBHOOK = os.getenv("DISCORD_WEBHOOK")
+TIMEZONE = os.getenv("TIMEZONE") or "UTC"
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+CAPSOLVER_API = os.getenv("CAPSOLVER_API")
+TWO_CAPTCHA_API = os.getenv("2CAPTCHA_API")
+
+# Define supported games
+SUPPORTED_GAMES = {
+    "hk4e_global": genshin.Game.GENSHIN,
+    "bh3_global": genshin.Game.HONKAI,
+    "hkrpg_global": genshin.Game.STARRAIL,
+}
+
+# Define game names
+GAME_NAMES = {
+    "hk4e_global": "Genshin Impact",
+    "bh3_global": "Honkai Impact 3",
+    "hkrpg_global": "Honkai: Star Rail",
+}
+
+# Define log colors
+LOG_COLORS = {
+    logging.DEBUG: "\x1b[38;20m",
+    logging.INFO: "\x1b[38;20m",
+    logging.WARNING: "\x1b[33;20m",
+    logging.ERROR: "\x1b[31;20m",
+    logging.CRITICAL: "\x1b[31;1m",
+    "reset": "\x1b[0m",
+}
+
+# Define log format
+LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+
 
 class CustomFormatter(logging.Formatter):
-    grey = "\x1b[38;20m"
-    yellow = "\x1b[33;20m"
-    red = "\x1b[31;20m"
-    bold_red = "\x1b[31;1m"
-    reset = "\x1b[0m"
-    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
-
-    FORMATS = {
-        logging.DEBUG: grey + format + reset,
-        logging.INFO: grey + format + reset,
-        logging.WARNING: yellow + format + reset,
-        logging.ERROR: red + format + reset,
-        logging.CRITICAL: bold_red + format + reset,
-    }
-
     def format(self, record):
-        log_fmt = self.FORMATS.get(record.levelno)
+        log_fmt = LOG_COLORS.get(record.levelno) + LOG_FORMAT + LOG_COLORS["reset"]
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
 
 
-logger = logging.getLogger("hoyolab-auto-login")
-logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
-
+# Configure logger
+logger.setLevel(LOG_LEVEL)
 ch = logging.StreamHandler()
-ch.setLevel(os.getenv("LOG_LEVEL", "INFO"))
-
+ch.setLevel(LOG_LEVEL)
 ch.setFormatter(CustomFormatter())
-
 logger.addHandler(ch)
 logger.propagate = False
 
 
-async def send_discord_embed(webhook_url: str, discord_id: int, cookie_num: str, rewards: dict() = None):
+async def send_discord_embed(webhook_url: str, discord_id: int, cookie_num: str, rewards: dict = None):
     webhook = AsyncDiscordWebhook(
         url=webhook_url,
-        username="Hoyolab Auto Login",
+        username="Hoyolab AutoLogin",
         avatar_url="https://avatars.githubusercontent.com/u/38610216?size=128",
         rate_limit_retry=True,
         allowed_mentions={"users": [discord_id]},
     )
     embed = DiscordEmbed(
-        title=f"Login / Redemption Result for Cookie {cookie_num}",
+        title=f"Login Result for Cookie {cookie_num}",
         color="E86D82" if rewards and rewards.get("errors") else "A385DE",
     )
     embed.set_thumbnail(url="https://media.discordapp.net/stickers/1098094222432800909.webp?size=160")
 
-    proper_game_names = {
-        "hk4e_global": "Genshin Impact",
-        "bh3_global": "Honkai Impact 3",
-        "hkrpg_global": "Honkai: Star Rail",
-    }
+    if rewards:
+        if rewards.get("errors"):
+            webhook.set_content(
+                f"There was an error while running your script, <@{discord_id}> <:TenshiPing:794247142411730954>"
+                if discord_id
+                else ""
+            )
+            embed.add_embed_field(
+                name="Error(s) encountered", value="\n".join(str(x) for x in rewards.get("errors")), inline=False
+            )
 
-    if not rewards:
-        return
-
-    if rewards.get("errors"):
-        webhook.set_content(
-            f"There was an error while running your script, <@{discord_id}> <:TenshiPing:794247142411730954>"
-            if discord_id
-            else ""
-        )
-        embed.add_embed_field(
-            name="Error(s) encountered", value="\n".join(str(x) for x in rewards.get("errors")), inline=False
-        )
-
-    for biz_name, data in rewards.items():
-        if biz_name != "errors":
-            embed.add_embed_field(name=proper_game_names.get(biz_name), value=data, inline=False)
+        for game, data in rewards.items():
+            if game != "errors":
+                embed.add_embed_field(name=GAME_NAMES.get(game), value=data, inline=False)
 
     webhook.add_embed(embed)
 
@@ -103,14 +116,13 @@ async def send_discord_embed(webhook_url: str, discord_id: int, cookie_num: str,
 
 
 async def solve_geetest(gt: str, challenge: str, url: str):
+    result = None
+    error = None
+
     def solve_using_2captcha(api_key):
         solver = TwoCaptcha(api_key)
         try:
-            result = solver.geetest(
-                gt=gt,
-                challenge=challenge,
-                url=url,
-            )
+            result = solver.geetest(gt=gt, challenge=challenge, url=url)
         except Exception as exc:
             error = f"2captcha attempt failed: {exc}"
             logger.error(error)
@@ -131,30 +143,19 @@ async def solve_geetest(gt: str, challenge: str, url: str):
             logger.error(error)
         return result, error or None
 
-    if os.getenv("2CAPTCHA_API"):
-        api_key = os.getenv("2CAPTCHA_API")
-        result, error = solve_using_2captcha(api_key)
-    elif os.getenv("CAPSOLVER_API") and not result:
-        api_key = os.getenv("CAPSOLVER_API")
-        result, error = await solve_using_capsolver(api_key)
+    if TWO_CAPTCHA_API:
+        result, error = solve_using_2captcha(TWO_CAPTCHA_API)
+    elif CAPSOLVER_API and not result:
+        result, error = await solve_using_capsolver(CAPSOLVER_API)
     return result, error
 
 
-async def claim_daily_reward(
-    cookie_num: str, client: genshin.Client, game_accounts: list, exclude_game: list
-):
-    supported_logins = {
-        "hk4e_global": genshin.Game.GENSHIN,
-        "bh3_global": genshin.Game.HONKAI,
-        "hkrpg_global": genshin.Game.STARRAIL,
-    }
-
+async def claim_daily_reward(cookie_num: str, client: genshin.Client, game_accounts: dict, exclude_game: list):
     rewards = {}
     rewards["errors"] = []
 
-    # claim daily reward for each game
     for game, details in game_accounts.items():
-        game_type = supported_logins.get(game)
+        game_type = SUPPORTED_GAMES.get(game)
         if exclude_game and game in exclude_game:
             logger.info(f"{cookie_num} Skipping login for {game}")
             continue
@@ -162,7 +163,7 @@ async def claim_daily_reward(
             logger.warning(f"{cookie_num} Account for {game} is unsupported, skipping login")
             continue
 
-        censored_uid = str(details.uid).replace(str(details.uid)[:5], "xxxxx")
+        censored_uid = str(details.uid).replace(str(details.uid)[:3], "xxx")
 
         # Max of 3 retries for captcha solve failure
         max_retries = 3
@@ -192,7 +193,6 @@ async def claim_daily_reward(
                 f"✅ Claimed {reward.amount}x {reward.name}" f" for {details.nickname} (UID {censored_uid})"
             )
             break
-        # All retries exhausted
         else:
             logger.error(f"{cookie_num} Unable to solve Geetest for {game}, skipping login")
             rewards["errors"].append(f"❌ Unable to solve Geetest captcha for {game}")
@@ -200,31 +200,23 @@ async def claim_daily_reward(
     return rewards
 
 
-async def redeem_game_code(cookie_num: str, client: genshin.Client, game_accounts: list, exclude_game: list):
+async def redeem_game_code(cookie_num: str, client: genshin.Client, game_accounts: dict, exclude_game: list):
     pass
 
 
 async def main(redeem_reward: bool = False, redeem_code: bool = False):
-    cookie = os.getenv("COOKIE", None)
-    if not cookie:
-        logger.critical("You forgot to give me one or more cookies 🍪")
-        exit(0)
-
-    cookies = cookie.split("#")
+    cookies = COOKIE.split("#")
     client = genshin.Client()
 
-    # Main loop to repeat the cycle everyday
     while True:
         for index, cookie in enumerate(cookies):
             game_accounts = {}
             cookie_num = f"{index + 1}/{len(cookies)}"
 
-            # Strip internal vars from cookie
             header_cookie = re.sub(r"DISCORD_ID=\d+;", "", cookie)
             header_cookie = re.sub(r"EXCLUDE_LOGIN=([^;]+);", "", cookie)
 
             client.set_cookies(header_cookie)
-            # Verify if cookie is valid
             try:
                 accounts = await client.get_game_accounts()
             except genshin.InvalidCookies:
@@ -234,10 +226,9 @@ async def main(redeem_reward: bool = False, redeem_code: bool = False):
             for account in accounts:
                 if not game_accounts.get(account.game_biz):
                     game_accounts[account.game_biz] = account
-            logger.info(f"{cookie_num} Cookie OK, detected {len(game_accounts)} unique game account(s)")
+            logger.info(f"{cookie_num} Cookie is OK, detected {len(game_accounts)} unique game account(s)")
 
-            # Parse excluded games into list
-            match: re.Match = re.search(r"EXCLUDE_LOGIN=([^;]+);", cookie)
+            match = re.search(r"EXCLUDE_LOGIN=([^;]+);", cookie)
             exclude_game = re.split(r"\s*,\s*", match.group(1)) if match else None
 
             rewards = (
@@ -262,13 +253,12 @@ async def main(redeem_reward: bool = False, redeem_code: bool = False):
                 else None
             )
 
-            webhook_url = os.getenv("DISCORD_WEBHOOK", None)
-            if webhook_url and rewards or codes:
+            if DISCORD_WEBHOOK and (rewards or codes):
                 match = re.search(r"DISCORD_ID=(\d+);", cookie)
                 discord_id = match.group(1) if match else None
                 await send_discord_embed(
                     rewards=rewards,
-                    webhook_url=webhook_url,
+                    webhook_url=DISCORD_WEBHOOK,
                     discord_id=discord_id,
                     cookie_num=cookie_num,
                 )
@@ -281,11 +271,10 @@ async def main(redeem_reward: bool = False, redeem_code: bool = False):
             return
 
         logger.info("Sleeping for a day...")
-        time.sleep(86400)
+        await asyncio.sleep(86400)
 
 
 if __name__ == "__main__":
-
     def login_task():
         logger.debug("Running on %s" % threading.current_thread())
         loop = asyncio.new_event_loop()
@@ -298,12 +287,11 @@ if __name__ == "__main__":
 
     try:
         schedule_time = os.getenv("SCHEDULE")
-        tz = os.getenv("TIMEZONE") or "UTC"
         if schedule_time:
             if os.getenv("RUN_ONCE"):
                 logger.warning("Ignoring RUN_ONCE since it will not work with SCHEDULE variable set")
-            logger.info(f"Running script as daemon, login task will run daily at {schedule_time} {tz}")
-            schedule.every().day.at(schedule_time, timezone(tz)).do(run_threaded, login_task)
+            logger.info(f"Running script as daemon, login task will run daily at {schedule_time} {TIMEZONE}")
+            schedule.every().day.at(schedule_time, timezone(TIMEZONE)).do(run_threaded, login_task)
             while True:
                 schedule.run_pending()
                 time.sleep(1)
