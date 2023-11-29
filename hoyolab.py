@@ -10,6 +10,7 @@ import genshin
 import schedule
 from discord_webhook import AsyncDiscordWebhook, DiscordEmbed
 from dotenv import load_dotenv
+from python3_capsolver.gee_test import GeeTest
 from pytz import timezone
 from twocaptcha import TwoCaptcha
 
@@ -20,7 +21,7 @@ load_dotenv()
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)",
 )
 logger = logging.getLogger("HAL")
 
@@ -98,7 +99,9 @@ async def send_discord_embed(webhook_url: str, discord_id: int, cookie_num: str,
                 else ""
             )
             embed.add_embed_field(
-                name="Error(s) encountered", value="\n".join(str(x) for x in rewards.get("errors")), inline=False
+                name="Error(s) encountered",
+                value="\n".join(str(x) for x in rewards.get("errors")),
+                inline=False,
             )
 
         for game, data in rewards.items():
@@ -150,7 +153,9 @@ async def solve_geetest(gt: str, challenge: str, url: str):
     return result, error
 
 
-async def claim_daily_reward(cookie_num: str, client: genshin.Client, game_accounts: dict, exclude_game: list):
+async def claim_daily_reward(
+    cookie_num: str, client: genshin.Client, game_accounts: dict, exclude_game: list
+):
     rewards = {}
     rewards["errors"] = []
 
@@ -275,6 +280,7 @@ async def main(redeem_reward: bool = False, redeem_code: bool = False):
 
 
 if __name__ == "__main__":
+
     def login_task():
         logger.debug("Running on %s" % threading.current_thread())
         loop = asyncio.new_event_loop()
