@@ -186,27 +186,20 @@ If you're on a fork and want to keep it automatically updated, install and confi
 
 When suggesting changes, please format your code with [black](https://pypi.org/project/black/) and [ruff](https://pypi.org/project/ruff/).
 
-Install dependencies and activate the pipenv with:
+Install [Poetry](https://python-poetry.org/) using [pipx](https://github.com/pypa/pipx). Install project dependencies with:
 
-```python
-pipenv install
-pipenv shell
+```shell
+poetry install --no-root --with dev
 ```
 
-For formatting:
+Install the pre-commit hooks with:
 
-```python
-pipenv install --dev
-black . ; ruff .
+```shell
+poetry run pre-commit install
 ```
 
-Or alternatively, you can also install pre-commit hooks which run the linters automatically on every commit
-```python
-pre-commit install
-```
-
-For testing:
+Launch the script with:
 
 ```python
-pipenv run login
+poetry run python hoyolab.py
 ```
