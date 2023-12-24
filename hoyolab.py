@@ -33,6 +33,12 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 CAPSOLVER_API = os.getenv("CAPSOLVER_API")
 TWO_CAPTCHA_API = os.getenv("2CAPTCHA_API")
 
+if not isinstance(COOKIE, str):
+    logger.error("COOKIE is not valid, exiting.")
+    exit(0)
+
+COOKIE.replace('"', "")
+
 # Define supported games
 SUPPORTED_GAMES = {
     "hk4e_global": genshin.Game.GENSHIN,
