@@ -33,6 +33,12 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 CAPSOLVER_API = os.getenv("CAPSOLVER_API")
 TWO_CAPTCHA_API = os.getenv("2CAPTCHA_API")
 
+if not isinstance(COOKIE, str):
+    logger.error("COOKIE is not valid, exiting.")
+    exit(0)
+
+COOKIE.replace('"', "")
+
 # Define supported games
 SUPPORTED_GAMES = {
     "hk4e_global": genshin.Game.GENSHIN,
@@ -91,22 +97,24 @@ async def send_discord_embed(webhook_url: str, discord_id: int, cookie_num: str,
     )
     embed.set_thumbnail(url="https://media.discordapp.net/stickers/1098094222432800909.webp?size=160")
 
-    if rewards:
-        if rewards.get("errors"):
-            webhook.set_content(
-                f"There was an error while running your script, <@{discord_id}> <:TenshiPing:794247142411730954>"
-                if discord_id
-                else ""
-            )
-            embed.add_embed_field(
-                name="Error(s) encountered",
-                value="\n".join(str(x) for x in rewards.get("errors")),
-                inline=False,
-            )
+    if not rewards or not isinstance(rewards, dict):
+        return
 
-        for game, data in rewards.items():
-            if game != "errors":
-                embed.add_embed_field(name=GAME_NAMES.get(game), value=data, inline=False)
+    if rewards.get("errors"):
+        webhook.set_content(
+            f"There was an error while running your script, <@{discord_id}> <:TenshiPing:794247142411730954>"
+            if discord_id
+            else ""
+        )
+        embed.add_embed_field(
+            name="Error(s) encountered",
+            value="\n".join(str(x) for x in rewards.get("errors")),
+            inline=False,
+        )
+
+    for game, data in rewards.items():
+        if game != "errors":
+            embed.add_embed_field(name=GAME_NAMES.get(game), value=data, inline=False)
 
     webhook.add_embed(embed)
 
@@ -212,6 +220,8 @@ async def redeem_game_code(cookie_num: str, client: genshin.Client, game_account
 async def main(redeem_reward: bool = False, redeem_code: bool = False):
     cookies = COOKIE.split("#")
     client = genshin.Client()
+    logger.info("Starting the script ...")
+    logger.info("-" * 50)
 
     while True:
         for index, cookie in enumerate(cookies):
@@ -236,37 +246,40 @@ async def main(redeem_reward: bool = False, redeem_code: bool = False):
             match = re.search(r"EXCLUDE_LOGIN=([^;]+);", cookie)
             exclude_game = re.split(r"\s*,\s*", match.group(1)) if match else None
 
-            rewards = (
-                await claim_daily_reward(
-                    cookie_num=cookie_num,
-                    client=client,
-                    game_accounts=game_accounts,
-                    exclude_game=exclude_game,
+            try:
+                rewards = (
+                    await claim_daily_reward(
+                        cookie_num=cookie_num,
+                        client=client,
+                        game_accounts=game_accounts,
+                        exclude_game=exclude_game,
+                    )
+                    if redeem_reward is True
+                    else None
                 )
-                if redeem_reward is True
-                else None
-            )
 
-            codes = (
-                await redeem_game_code(
-                    cookie_num=cookie_num,
-                    client=client,
-                    game_accounts=game_accounts,
-                    exclude_game=exclude_game,
+                codes = (
+                    await redeem_game_code(
+                        cookie_num=cookie_num,
+                        client=client,
+                        game_accounts=game_accounts,
+                        exclude_game=exclude_game,
+                    )
+                    if redeem_code is True
+                    else None
                 )
-                if redeem_code is True
-                else None
-            )
 
-            if DISCORD_WEBHOOK and (rewards or codes):
-                match = re.search(r"DISCORD_ID=(\d+);", cookie)
-                discord_id = match.group(1) if match else None
-                await send_discord_embed(
-                    rewards=rewards,
-                    webhook_url=DISCORD_WEBHOOK,
-                    discord_id=discord_id,
-                    cookie_num=cookie_num,
-                )
+                if DISCORD_WEBHOOK and (rewards or codes):
+                    match = re.search(r"DISCORD_ID=(\d+);", cookie)
+                    discord_id = match.group(1) if match else None
+                    await send_discord_embed(
+                        rewards=rewards,
+                        webhook_url=DISCORD_WEBHOOK,
+                        discord_id=discord_id,
+                        cookie_num=cookie_num,
+                    )
+            except Exception as exc:
+                logger.exception(f"{cookie_num} An error occurred: {exc}")
 
         if os.getenv("RUN_ONCE") and not os.getenv("SCHEDULE"):
             logger.info("All done, shutting down script.")
@@ -275,7 +288,8 @@ async def main(redeem_reward: bool = False, redeem_code: bool = False):
         if os.getenv("SCHEDULE"):
             return
 
-        logger.info("Sleeping for a day...")
+        logger.info("-" * 50)
+        logger.info("Sleeping for a day ...")
         await asyncio.sleep(86400)
 
 

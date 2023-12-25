@@ -82,25 +82,6 @@ Refer to [List of tz database time zones](https://en.wikipedia.org/wiki/List_of_
 ## Installation
 
 <details>
-<summary><b>Running the script on Railway</b></summary>
-
-[Railway's Starter plan](https://railway.app/pricing) has an execution limit of 500 hours a month. Since Railway has no option to schedule runtime, this script will run constantly. Make sure you're under their **Developer plan** to lift the hour limit. It's still free if your resource usage is under their $5 free credit limit, which this script will consume at most $0.50 monthly.
-
-1. [Sign Up on Railway](https://railway.app?referralCode=mh9o_1) if you haven't.
-2. Fork this repo  
-![image](https://user-images.githubusercontent.com/38610216/216755745-4c347b2c-1e1b-4672-8212-17bd79a24d16.png)
-3. [Make a new project on Railway](https://railway.app/new) and select this option  
-![image](https://user-images.githubusercontent.com/38610216/216755833-d97d44ed-0ec5-47cd-9d7d-2130c807de20.png)
-4. Select the new repo you just forked  
-![image](https://user-images.githubusercontent.com/38610216/216755849-01d034f3-e107-43ab-b4e6-7ded9c9a9123.png)
-5. Click "Add Variables" and fill in your stuff, refer to the suggestions below it. After you're done it should look like this  
-![image](https://user-images.githubusercontent.com/38610216/216755944-36af97ea-3bb6-44dc-9d2f-4939a4edbb54.png)
-6. Wait for the build to finish and check your deployment logs to verify it's working  
-![image](https://user-images.githubusercontent.com/38610216/216756065-98e0543a-b4d1-48fa-9431-e36e20a66214.png)
-
-</details>
-
-<details>
 <summary><b>Running the script on Northflank</b></summary>
 
 In addition to hosting your applications, [Northflank](https://northflank.com/pricing) also lets you schedule jobs to run in CRON format, and their free tier does not have an hourly limit unlike Railway. But in a free project, you are limited to 2 jobs at any time.
@@ -170,7 +151,6 @@ Try logging out and logging back into your Hoyolab account. If it still doesn't 
   * Genshin Impact - [Code Redemption](https://genshin.hoyoverse.com/en/gift) | [Daily Sign-in](https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481)
   * Honkai: Star Rail - [Code Redemption](https://hsr.hoyoverse.com/gift) | [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311)
   * Honkai Impact 3 - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin-bh3/index.html?act_id=e202110291205111)
-  * Tears of Themis - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/nxx/index.html?act_id=e202202281857121)
 
 - **Why aren't you using GitHub Actions?**  
 Using GitHub Actions may violate GitHub's Terms of Service and lead to this repository being taken down.
@@ -186,27 +166,20 @@ If you're on a fork and want to keep it automatically updated, install and confi
 
 When suggesting changes, please format your code with [black](https://pypi.org/project/black/) and [ruff](https://pypi.org/project/ruff/).
 
-Install dependencies and activate the pipenv with:
+Install [Poetry](https://python-poetry.org/) using [pipx](https://github.com/pypa/pipx). Install project dependencies with:
 
-```python
-pipenv install
-pipenv shell
+```shell
+poetry install --no-root --with dev
 ```
 
-For formatting:
+Install the pre-commit hooks with:
 
-```python
-pipenv install --dev
-black . ; ruff .
+```shell
+poetry run pre-commit install
 ```
 
-Or alternatively, you can also install pre-commit hooks which run the linters automatically on every commit
-```python
-pre-commit install
-```
+Launch the script with:
 
-For testing:
-
-```python
-pipenv run login
+```shell
+poetry run python hoyolab.py
 ```
