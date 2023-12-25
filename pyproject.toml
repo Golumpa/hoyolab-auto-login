@@ -1,6 +1,6 @@
 [tool.black]
 line-length = "110"
-target-version = ['py310']
+target-version = ['py311']
 include = '\.pyi?$'
 extend-exclude = '''
 (
@@ -59,6 +59,3 @@ pre-commit = "^3.6.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-login = "hoyolab:main"
