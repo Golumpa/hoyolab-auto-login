@@ -97,22 +97,24 @@ async def send_discord_embed(webhook_url: str, discord_id: int, cookie_num: str,
     )
     embed.set_thumbnail(url="https://media.discordapp.net/stickers/1098094222432800909.webp?size=160")
 
-    if rewards:
-        if rewards.get("errors"):
-            webhook.set_content(
-                f"There was an error while running your script, <@{discord_id}> <:TenshiPing:794247142411730954>"
-                if discord_id
-                else ""
-            )
-            embed.add_embed_field(
-                name="Error(s) encountered",
-                value="\n".join(str(x) for x in rewards.get("errors")),
-                inline=False,
-            )
+    if not rewards or not isinstance(rewards, dict):
+        return
 
-        for game, data in rewards.items():
-            if game != "errors":
-                embed.add_embed_field(name=GAME_NAMES.get(game), value=data, inline=False)
+    if rewards.get("errors"):
+        webhook.set_content(
+            f"There was an error while running your script, <@{discord_id}> <:TenshiPing:794247142411730954>"
+            if discord_id
+            else ""
+        )
+        embed.add_embed_field(
+            name="Error(s) encountered",
+            value="\n".join(str(x) for x in rewards.get("errors")),
+            inline=False,
+        )
+
+    for game, data in rewards.items():
+        if game != "errors":
+            embed.add_embed_field(name=GAME_NAMES.get(game), value=data, inline=False)
 
     webhook.add_embed(embed)
 
