@@ -131,6 +131,7 @@ package-lock.json
 node_modules/
 
 # Unused repository files
+images/
 .env.example
 .gitignore
 .dockerignore
