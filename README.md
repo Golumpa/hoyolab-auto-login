@@ -42,9 +42,9 @@ A simple program to always claim Hoyolab's daily login system for Hoyoverse game
 <details>
 <summary><b>Hoyolab account cookie (<code>COOKIE</code>)</b></summary>
 
-Navigate to [Hoyolab website](https://www.hoyolab.com/) with your account logged in, open developer tools on your browser (F12 for Firefox/Chrome), navigate to Console tab, enter `document.cookie` in, and copy the long-string text output without the quotation marks.
+Obtain your cookie in the code redemption page of any Hoyolab-supported games. Refer to the image below for guide.
 
-![image](https://raw.githubusercontent.com/raidensakura/hoyolab-auto-login/f0e36c3d39f6e9363b3c772e63ded57c5fbae8c8/images/3.png)
+![obtain_cookie](https://github.com/raidensakura/hoyolab-auto-login/assets/38610216/7837cbbd-f987-4a31-9317-757595182653)
 
 </details>
 
@@ -59,7 +59,7 @@ You can also choose to use existing one by clicking on `Copy Webhook URL`.
 
 You can also configure the script to notify (ping) your Discord ID in case of a login failure. To do this, append `DISCORD_ID=1234567890; rest_of_cookie=; ...` at the start your cookie.
 
-![image](https://raw.githubusercontent.com/raidensakura/hoyolab-auto-login/f0e36c3d39f6e9363b3c772e63ded57c5fbae8c8/images/5.png)
+![5](https://github.com/raidensakura/hoyolab-auto-login/assets/38610216/b9d66129-5ef4-4a3a-8331-13de8a2f7f8b)
 
 </details>
 
