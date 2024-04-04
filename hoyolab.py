@@ -121,6 +121,7 @@ async def send_discord_embed(webhook_url: str, discord_id: int, cookie_num: str,
     response = await webhook.execute()
     if response.status_code == 200:
         logger.info(f"{cookie_num} Sent Discord embed ✨")
+        await asyncio.sleep(1.5)
     else:
         logger.error(f"Failed to send Discord embed: {response}")
     return
@@ -225,16 +226,28 @@ async def main(redeem_reward: bool = False, redeem_code: bool = False):
 
     while True:
         for index, cookie in enumerate(cookies):
-            game_accounts = {}
-            cookie_num = f"{index + 1}/{len(cookies)}"
+            match = re.search(r"DISCORD_ID=(\d+);", cookie)
+            discord_id = match.group(1) if match else None
+
+            match = re.search(r"EXCLUDE_LOGIN=([^;]+);", cookie)
+            exclude_game = re.split(r"\s*,\s*", match.group(1)) if match else None
 
             header_cookie = re.sub(r"DISCORD_ID=\d+;", "", cookie)
             header_cookie = re.sub(r"EXCLUDE_LOGIN=([^;]+);", "", cookie)
+
+            game_accounts = {}
+            cookie_num = f"{index + 1}/{len(cookies)}"
 
             client.set_cookies(header_cookie)
             try:
                 accounts = await client.get_game_accounts()
             except genshin.InvalidCookies:
+                await send_discord_embed(
+                    rewards={"errors": ["Your cookie is invalid"]},
+                    webhook_url=DISCORD_WEBHOOK,
+                    discord_id=discord_id,
+                    cookie_num=cookie_num,
+                )
                 logger.error(f"{cookie_num} Cookie invalid, skipping login")
                 continue
 
@@ -242,9 +255,6 @@ async def main(redeem_reward: bool = False, redeem_code: bool = False):
                 if not game_accounts.get(account.game_biz):
                     game_accounts[account.game_biz] = account
             logger.info(f"{cookie_num} Cookie is OK, detected {len(game_accounts)} unique game account(s)")
-
-            match = re.search(r"EXCLUDE_LOGIN=([^;]+);", cookie)
-            exclude_game = re.split(r"\s*,\s*", match.group(1)) if match else None
 
             try:
                 rewards = (
@@ -270,8 +280,6 @@ async def main(redeem_reward: bool = False, redeem_code: bool = False):
                 )
 
                 if DISCORD_WEBHOOK and (rewards or codes):
-                    match = re.search(r"DISCORD_ID=(\d+);", cookie)
-                    discord_id = match.group(1) if match else None
                     await send_discord_embed(
                         rewards=rewards,
                         webhook_url=DISCORD_WEBHOOK,
