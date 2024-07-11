@@ -4,11 +4,8 @@
   <img src="https://imgur.com/L54eATql.png">
   <p><b>Hoyolab Auto Login</b></p>
   <img alt="Static Badge" src="https://img.shields.io/badge/3.10_--_3.11-red?logo=python&logoColor=white&label=Python&labelColor=%233772a2&color=%23ffdd54">
-  <a href="[https://github.com/raidensakura](https://github.com/python/black)"><img src="https://img.shields.io/badge/code%20style-black-1c1c1c.svg"></a>
-  <a href="https://dsc.gg/transience/"><img src="https://discord.com/api/guilds/616969119685935162/widget.png"></a>
-  <a href="https://ko-fi.com/P5P6D65UW">
-  	<img alt="Static Badge" src="https://img.shields.io/badge/ko--fi.com%2Fraidensakura-d11df9?logo=kofi&logoColor=white&label=Support%20me&color=%23ff5b62">
-  </a>
+  <a href="https://github.com/python/black"><img src="https://img.shields.io/badge/code%20style-black-1c1c1c.svg"></a>
+
 </h1>
 
 <p align="center">
@@ -27,7 +24,7 @@
 
 ## Overview
 
-A simple program to always claim Hoyolab's daily login system for Hoyoverse games. Script was originally made by [vermaysha/Hoyolab-Auto-Daily-Checkin](https://github.com/vermaysha/Hoyolab-Auto-Daily-Checkin), but since the original repository is archived I decided to fork and maintain it myself, along with some improvements and installation guide.
+A simple program to always claim Hoyolab's daily login system for Hoyoverse games. Script was originally made by [vermaysha/Hoyolab-Auto-Daily-Checkin](https://github.com/vermaysha/Hoyolab-Auto-Daily-Checkin), forked by [raidensakura/hoyolab-auto-login](https://github.com/raidensakura/hoyolab-auto-login) and now maintained by myself, there will be no major improvements but I welcome pull requests.
 
 ### **Features:**
 
@@ -112,7 +109,8 @@ In addition to hosting your applications, [Northflank](https://northflank.com/pr
 The supported games for now are:
   - Honkai Impact 3rd  
   - Genshin Impact  
-  - Honkai: Star Rail   
+  - Honkai: Star Rail  
+  - Zenless Zone Zero
 
   If you've bound those game accounts to your Hoyolab account, it will claim the daily login in all of them.
 
@@ -126,12 +124,13 @@ Try logging out and logging back into your Hoyolab account. If it still doesn't 
   * Genshin Impact - [Code Redemption](https://genshin.hoyoverse.com/en/gift) | [Daily Sign-in](https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481)
   * Honkai: Star Rail - [Code Redemption](https://hsr.hoyoverse.com/gift) | [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311)
   * Honkai Impact 3 - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin-bh3/index.html?act_id=e202110291205111)
+  * Zenless Zone Zero - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/zzz/e202406031448091.html?act_id=e202406031448091)
 
 - **Why aren't you using GitHub Actions?**  
 Using GitHub Actions may violate GitHub's Terms of Service and lead to this repository being taken down.
 
 - **If you have any other questions**  
-Feel free to join my [Discord server](https://dsc.gg/transience) and post your question there. I'll try to reply as soon as I can.
+Feel free to join my [Discord server](https://discord.gg/BVqnQcTxBY) and post your question there. I'll try to reply as soon as I can.
 
 ## Updating
 
