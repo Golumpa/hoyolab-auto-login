@@ -44,6 +44,7 @@ SUPPORTED_GAMES = {
     "hk4e_global": genshin.Game.GENSHIN,
     "bh3_global": genshin.Game.HONKAI,
     "hkrpg_global": genshin.Game.STARRAIL,
+    "nap_global": genshin.Game.ZZZ,
 }
 
 # Define game names
@@ -51,6 +52,7 @@ GAME_NAMES = {
     "hk4e_global": "Genshin Impact",
     "bh3_global": "Honkai Impact 3",
     "hkrpg_global": "Honkai: Star Rail",
+    "nap_global": "Zenless Zone Zero",
 }
 
 # Define log colors
