@@ -90,15 +90,15 @@ In addition to hosting your applications, [Northflank](https://northflank.com/pr
 3. Enter the time at which you want the script to run, in CRON format. Refer to [crontab.guru](https://crontab.guru/) for an explanation of cron formatting.  
 ![image](https://user-images.githubusercontent.com/38610216/235667841-fa553f07-5c44-4ab1-ad5a-5c1d44c25475.png)
 4. Select 'External Image' under 'Job source' and use this URL for 'Image path':  
-`ghcr.io/golumpa/hoyolab-auto-login:master`  
-![image](https://user-images.githubusercontent.com/38610216/235668679-2c7f7125-8c86-45db-8c55-6efd8ab1e306.png)
-5. Fill in your credentials under 'Environmental Variables'. Make sure to set `RUN_ONCE` to `True` in the env.  
+`ghcr.io/golumpa/hoyolab-auto-login:master`
+![image](https://github.com/user-attachments/assets/217625f4-38db-4c5e-8611-7142303d41c0)
+6. Fill in your credentials under 'Environmental Variables'. Make sure to set `RUN_ONCE` to `True` in the env.  
 ![image](https://user-images.githubusercontent.com/38610216/235669138-5e8bd902-3aab-41c1-853e-88c8a8ec8f39.png)
-6. Save your script. Now, execute it manually by clicking the 'Run job' button, as shown:  
+7. Save your script. Now, execute it manually by clicking the 'Run job' button, as shown:  
 ![image](https://user-images.githubusercontent.com/38610216/235669964-79586949-1ed9-49f7-9d5f-cce550a60d2b.png)
-7. You should see a new entry under 'Recent job runs', as follows:  
+8. You should see a new entry under 'Recent job runs', as follows:  
 ![image](https://user-images.githubusercontent.com/38610216/235670311-c26d63d4-730c-48e2-bf6a-abed1639da0b.png)
-8. Click on it, and then click on its entry under 'Containers'. If your script is working correctly, it should show a log as follows:  
+9. Click on it, and then click on its entry under 'Containers'. If your script is working correctly, it should show a log as follows:  
 ![Untitled](https://user-images.githubusercontent.com/38610216/235671115-e558088f-0d1f-4fbf-a785-39766409d8a5.png)
 
 </details>
