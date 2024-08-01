@@ -89,7 +89,7 @@ In addition to hosting your applications, [Northflank](https://northflank.com/pr
 ![image](https://user-images.githubusercontent.com/38610216/235667601-d3a09127-3ac7-4d24-9d25-b843da55192e.png)
 3. Enter the time at which you want the script to run, in CRON format. Refer to [crontab.guru](https://crontab.guru/) for an explanation of cron formatting.  
 ![image](https://user-images.githubusercontent.com/38610216/235667841-fa553f07-5c44-4ab1-ad5a-5c1d44c25475.png)
-4. Select 'External Image' under 'Job source' and use this URL for 'Image path':  
+4. Select 'External Image' under 'Job source' and use this URL for 'Image path':
 `ghcr.io/golumpa/hoyolab-auto-login:master`
 ![image](https://github.com/user-attachments/assets/217625f4-38db-4c5e-8611-7142303d41c0)
 6. Fill in your credentials under 'Environmental Variables'. Make sure to set `RUN_ONCE` to `True` in the env.  
