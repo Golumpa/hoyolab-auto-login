@@ -45,6 +45,7 @@ SUPPORTED_GAMES = {
     "bh3_global": genshin.Game.HONKAI,
     "hkrpg_global": genshin.Game.STARRAIL,
     "nap_global": genshin.Game.ZZZ,
+    "nxx_global": genshin.Game.TOT,
 }
 
 # Define game names
@@ -53,6 +54,7 @@ GAME_NAMES = {
     "bh3_global": "Honkai Impact 3",
     "hkrpg_global": "Honkai: Star Rail",
     "nap_global": "Zenless Zone Zero",
+    "nxx_global": "Tears of Themis",
 }
 
 # Define log colors
@@ -167,13 +169,12 @@ async def solve_geetest(gt: str, challenge: str, url: str):
 async def claim_daily_reward(
     cookie_num: str, client: genshin.Client, game_accounts: dict, exclude_game: list
 ):
-    rewards = {}
-    rewards["errors"] = []
+    rewards = {"errors": []}
 
     for game, details in game_accounts.items():
         game_type = SUPPORTED_GAMES.get(game)
         if exclude_game and game in exclude_game:
-            logger.info(f"{cookie_num} Skipping login for {game}")
+            logger.info(f"{cookie_num} Skipping login for {GAME_NAMES.get(game)}")
             continue
         elif game_type is None:
             logger.warning(f"{cookie_num} Account for {game} is unsupported, skipping login")
@@ -187,11 +188,11 @@ async def claim_daily_reward(
             try:
                 reward = await client.claim_daily_reward(game=game_type)
             except genshin.AlreadyClaimed:
-                logger.info(f"{cookie_num} Daily reward already claimed for {game}")
+                logger.info(f"{cookie_num} Daily reward already claimed for {GAME_NAMES.get(game)}")
                 rewards[game] = f"✅ Already claimed for {details.nickname} (UID {censored_uid})"
                 break
             except genshin.errors.GeetestTriggered as exc:
-                logger.info(f"{cookie_num} Geetest triggered for {game}")
+                logger.info(f"{cookie_num} Geetest triggered for {GAME_NAMES.get(game)}")
                 solved, error = await solve_geetest(
                     gt=exc.gt, challenge=exc.challenge, url="https://hoyolab.com"
                 )
@@ -200,7 +201,7 @@ async def claim_daily_reward(
                     continue
                 reward = await client.claim_daily_reward(game=game_type, challenge=solved)
             except Exception as exc:
-                err = f"Login failed for {game}: {exc}"
+                err = f"Login failed for {GAME_NAMES.get(game)}: {exc}"
                 logger.error(f"{cookie_num} {err}")
                 rewards["errors"].append(err)
                 break
@@ -210,8 +211,8 @@ async def claim_daily_reward(
             )
             break
         else:
-            logger.error(f"{cookie_num} Unable to solve Geetest for {game}, skipping login")
-            rewards["errors"].append(f"❌ Unable to solve Geetest captcha for {game}")
+            logger.error(f"{cookie_num} Unable to solve Geetest for {GAME_NAMES.get(game)}, skipping login")
+            rewards["errors"].append(f"❌ Unable to solve Geetest captcha for {GAME_NAMES.get(game)}")
 
     return rewards
 

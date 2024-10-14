@@ -1,5 +1,3 @@
-<!-- markdownlint-disable MD033 -->
-
 <h1 align="center">
   <img src="https://imgur.com/L54eATql.png">
   <p><b>Hoyolab Auto Login</b></p>
@@ -24,7 +22,7 @@
 
 ## Overview
 
-A simple program to always claim Hoyolab's daily login system for Hoyoverse games. Script was originally made by [vermaysha/Hoyolab-Auto-Daily-Checkin](https://github.com/vermaysha/Hoyolab-Auto-Daily-Checkin), forked by [raidensakura/hoyolab-auto-login](https://github.com/raidensakura/hoyolab-auto-login) and now maintained by myself, there will be no major improvements but I welcome pull requests.
+A simple program to always claim Hoyolab's daily login system for Hoyoverse games. Script was originally made by [vermaysha/Hoyolab-Auto-Daily-Checkin](https://github.com/vermaysha/Hoyolab-Auto-Daily-Checkin), forked by [raidensakura/hoyolab-auto-login](https://github.com/raidensakura/hoyolab-auto-login) and now maintained by myself, there will be no major improvements, but I welcome pull requests.
 
 ### **Features:**
 
@@ -92,13 +90,13 @@ In addition to hosting your applications, [Northflank](https://northflank.com/pr
 4. Select 'External Image' under 'Job source' and use this URL for 'Image path':
 `ghcr.io/golumpa/hoyolab-auto-login:master`
 ![image](https://github.com/user-attachments/assets/217625f4-38db-4c5e-8611-7142303d41c0)
-6. Fill in your credentials under 'Environmental Variables'. Make sure to set `RUN_ONCE` to `True` in the env.  
+5. Fill in your credentials under 'Environmental Variables'. Make sure to set `RUN_ONCE` to `True` in the env.  
 ![image](https://user-images.githubusercontent.com/38610216/235669138-5e8bd902-3aab-41c1-853e-88c8a8ec8f39.png)
-7. Save your script. Now, execute it manually by clicking the 'Run job' button, as shown:  
+6. Save your script. Now, execute it manually by clicking the 'Run job' button, as shown:  
 ![image](https://user-images.githubusercontent.com/38610216/235669964-79586949-1ed9-49f7-9d5f-cce550a60d2b.png)
-8. You should see a new entry under 'Recent job runs', as follows:  
+7. You should see a new entry under 'Recent job runs', as follows:  
 ![image](https://user-images.githubusercontent.com/38610216/235670311-c26d63d4-730c-48e2-bf6a-abed1639da0b.png)
-9. Click on it, and then click on its entry under 'Containers'. If your script is working correctly, it should show a log as follows:  
+8. Click on it, and then click on its entry under 'Containers'. If your script is working correctly, it should show a log as follows:  
 ![Untitled](https://user-images.githubusercontent.com/38610216/235671115-e558088f-0d1f-4fbf-a785-39766409d8a5.png)
 
 </details>
@@ -107,27 +105,33 @@ In addition to hosting your applications, [Northflank](https://northflank.com/pr
 
 - **If I play multiple Hoyoverse games, does it log into all of them?**  
 The supported games for now are:
-  - Honkai Impact 3rd  
-  - Genshin Impact  
-  - Honkai: Star Rail  
+  - Honkai Impact 3rd
+  - Genshin Impact
+  - Honkai: Star Rail
+  - Tears of Themis
   - Zenless Zone Zero
 
   If you've bound those game accounts to your Hoyolab account, it will claim the daily login in all of them.
+
 
 - **How do I log in with multiple Hoyolab accounts?**  
 Add a `#` between your cookies.<br><br>
 Example:  
 ```COOKIE1#COOKIE2#COOKIE3```
 
+
 - **My `cookie_token` is missing!**  
 Try logging out and logging back into your Hoyolab account. If it still doesn't work, try getting it from the code redemption or daily sign-in webpage instead:
   * Genshin Impact - [Code Redemption](https://genshin.hoyoverse.com/en/gift) | [Daily Sign-in](https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481)
   * Honkai: Star Rail - [Code Redemption](https://hsr.hoyoverse.com/gift) | [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311)
   * Honkai Impact 3 - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin-bh3/index.html?act_id=e202110291205111)
+  * Tears of Themis - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/nxx/index.html?act_id=e202202281857121)
   * Zenless Zone Zero - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/zzz/e202406031448091.html?act_id=e202406031448091)
+
 
 - **Why aren't you using GitHub Actions?**  
 Using GitHub Actions may violate GitHub's Terms of Service and lead to this repository being taken down.
+
 
 - **If you have any other questions**  
 Feel free to join my [Discord server](https://discord.gg/BVqnQcTxBY) and post your question there. I'll try to reply as soon as I can.
