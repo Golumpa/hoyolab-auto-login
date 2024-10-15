@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hoyolab-auto-login"
-version = "0.2.1"
+version = "0.2.2"
 description = "A simple program to always claim Hoyolab's daily login system for Hoyoverse games"
 authors = ["Golumpa <admin@golumpa.moe>", "Raiden Sakura <raiden@project-mei.xyz>"]
 license = "MIT"

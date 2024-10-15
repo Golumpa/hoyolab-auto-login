@@ -45,7 +45,6 @@ SUPPORTED_GAMES = {
     "bh3_global": genshin.Game.HONKAI,
     "hkrpg_global": genshin.Game.STARRAIL,
     "nap_global": genshin.Game.ZZZ,
-    "nxx_global": genshin.Game.TOT,
 }
 
 # Define game names
@@ -54,7 +53,6 @@ GAME_NAMES = {
     "bh3_global": "Honkai Impact 3",
     "hkrpg_global": "Honkai: Star Rail",
     "nap_global": "Zenless Zone Zero",
-    "nxx_global": "Tears of Themis",
 }
 
 # Define log colors
