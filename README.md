@@ -108,7 +108,6 @@ The supported games for now are:
   - Honkai Impact 3rd
   - Genshin Impact
   - Honkai: Star Rail
-  - Tears of Themis
   - Zenless Zone Zero
 
   If you've bound those game accounts to your Hoyolab account, it will claim the daily login in all of them.
@@ -125,7 +124,6 @@ Try logging out and logging back into your Hoyolab account. If it still doesn't 
   * Genshin Impact - [Code Redemption](https://genshin.hoyoverse.com/en/gift) | [Daily Sign-in](https://act.hoyolab.com/ys/event/signin-sea-v3/index.html?act_id=e202102251931481)
   * Honkai: Star Rail - [Code Redemption](https://hsr.hoyoverse.com/gift) | [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/hkrpg/index.html?act_id=e202303301540311)
   * Honkai Impact 3 - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin-bh3/index.html?act_id=e202110291205111)
-  * Tears of Themis - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/nxx/index.html?act_id=e202202281857121)
   * Zenless Zone Zero - [Daily Sign-in](https://act.hoyolab.com/bbs/event/signin/zzz/e202406031448091.html?act_id=e202406031448091)
 
 
